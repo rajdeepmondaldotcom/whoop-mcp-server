@@ -37,6 +37,7 @@ from whoop_mcp.summaries import (
     compare_aggregates,
     cycle_date,
     fetch_bundle,
+    recovery_day_points,
     recovery_trends,
     sleep_date,
     sleep_trends,
@@ -526,11 +527,18 @@ async def compare_periods(
     )
     agg_a = aggregate_period(bundle_a, a_start, a_end)
     agg_b = aggregate_period(bundle_b, b_start, b_end)
-    return {
+    result = {
         "period_a": agg_a,
         "period_b": agg_b,
         "comparison": compare_aggregates(agg_a, agg_b),
     }
+    truncated = sorted({*bundle_a.truncated, *bundle_b.truncated})
+    if truncated:
+        result["notes"] = [
+            f"Some collections hit the record cap and were truncated: {', '.join(truncated)}; "
+            "averages may be based on partial data."
+        ]
+    return result
 
 
 # -------------------------------------------- ChatGPT connector compatibility
@@ -626,8 +634,6 @@ async def search(query: str) -> dict[str, Any]:
     results: list[dict[str, str]] = []
 
     if not types or types & {"recovery", "strain", "sleep"}:
-        from whoop_mcp.summaries import recovery_day_points
-
         recovery_by_day = {
             d: r for d, r in recovery_day_points(bundle.recoveries, bundle.cycles)
         }
@@ -719,13 +725,22 @@ async def fetch(id: str) -> dict[str, Any]:
     client = await get_client()
     url = f"https://app.whoop.com/#whoop-mcp/{kind}/{rest}" if rest else "https://app.whoop.com"
 
+    def bad_id(reason: str) -> WhoopError:
+        return WhoopError(
+            f"Invalid document id {id!r} ({reason}). Expected day:YYYY-MM-DD, "
+            "sleep:<uuid>, workout:<uuid>, cycle:<int>, recovery:<cycle_int>, or profile."
+        )
+
     if kind == "profile":
         profile, body = await asyncio.gather(client.profile(), client.body_measurement())
         document: dict[str, Any] = transform_profile(profile or {}, body or {})
         title = "WHOOP profile"
         metadata = {"type": "profile"}
     elif kind == "day":
-        day = date.fromisoformat(rest)
+        try:
+            day = date.fromisoformat(rest)
+        except ValueError:
+            raise bad_id("the date must be YYYY-MM-DD") from None
         document = await _daily(day)
         title = f"WHOOP day summary — {day.strftime('%a %b %d %Y')}"
         metadata = {"type": "day_summary", "date": rest}
@@ -738,19 +753,21 @@ async def fetch(id: str) -> dict[str, Any]:
         sport = str(document.get("sport", "workout")).title()
         title = f"{sport} — {document.get('date', rest)}"
         metadata = {"type": "workout", "date": str(document.get("date", ""))}
-    elif kind == "cycle":
-        document = transform_cycle(await client.cycle(int(rest)))
-        title = f"Cycle — {document.get('date', rest)}"
-        metadata = {"type": "cycle", "date": str(document.get("date", ""))}
-    elif kind == "recovery":
-        document = transform_recovery(await client.cycle_recovery(int(rest)))
-        title = f"Recovery — cycle {rest}"
-        metadata = {"type": "recovery", "cycle_id": rest}
+    elif kind in ("cycle", "recovery"):
+        try:
+            cycle_id = int(rest)
+        except ValueError:
+            raise bad_id("the cycle id must be an integer") from None
+        if kind == "cycle":
+            document = transform_cycle(await client.cycle(cycle_id))
+            title = f"Cycle — {document.get('date', rest)}"
+            metadata = {"type": "cycle", "date": str(document.get("date", ""))}
+        else:
+            document = transform_recovery(await client.cycle_recovery(cycle_id))
+            title = f"Recovery — cycle {rest}"
+            metadata = {"type": "recovery", "cycle_id": rest}
     else:
-        raise WhoopError(
-            f"Unknown document id {id!r}. Expected day:YYYY-MM-DD, sleep:<uuid>, "
-            "workout:<uuid>, cycle:<int>, recovery:<cycle_int>, or profile."
-        )
+        raise bad_id("unknown document type")
 
     return {
         "id": id,

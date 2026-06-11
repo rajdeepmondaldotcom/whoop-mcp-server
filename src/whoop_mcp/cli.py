@@ -29,6 +29,10 @@ def _configure_logging(level: str) -> None:
         level=getattr(logging, level, logging.INFO),
         format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
     )
+    # httpx logs every request at INFO; that's noise unless debugging.
+    if level != "DEBUG":
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 
 def _apply_overrides(settings: Settings, args: argparse.Namespace) -> Settings:

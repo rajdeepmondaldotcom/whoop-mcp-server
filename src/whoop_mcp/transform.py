@@ -56,8 +56,10 @@ def kj_to_kcal(kj: float | None) -> int | None:
     return None if kj is None else int(round(kj * KCAL_PER_KJ))
 
 
-def rounded(value: float | None, digits: int = 1) -> float | None:
-    return None if value is None else round(value, digits)
+def rounded(value: float | None, digits: int = 1) -> float | int | None:
+    if value is None:
+        return None
+    return int(round(value)) if digits == 0 else round(value, digits)
 
 
 def recovery_zone(score: float | None) -> str | None:

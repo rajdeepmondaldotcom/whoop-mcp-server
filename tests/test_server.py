@@ -147,7 +147,7 @@ async def test_fetch_workout_and_profile_ids(session, fake_whoop: FakeWhoop):
 async def test_fetch_unknown_id_is_clean_error(session):
     result = await session.call_tool("fetch", {"id": "nonsense"})
     assert result.isError
-    assert "Unknown document id" in result.content[0].text
+    assert "Invalid document id" in result.content[0].text
 
 
 async def test_invalid_date_expression_is_clean_error(session):

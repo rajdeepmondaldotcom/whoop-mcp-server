@@ -1,0 +1,56 @@
+[project]
+name = "whoop-mcp"
+version = "0.1.0"
+description = "MCP server for WHOOP — recovery, sleep, strain, and workout data for Claude, ChatGPT, and any MCP client"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Rajdeep Mondal", email = "rajdeep@rajdeepmondal.com" }]
+keywords = ["whoop", "mcp", "model-context-protocol", "health", "fitness", "claude", "chatgpt"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "mcp>=1.27,<2",
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://github.com/rajdeepmondaldotcom/whoop-mcp"
+Issues = "https://github.com/rajdeepmondaldotcom/whoop-mcp/issues"
+
+[project.scripts]
+whoop-mcp = "whoop_mcp.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "anyio>=4",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/whoop_mcp"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

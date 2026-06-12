@@ -1,7 +1,7 @@
 [project]
 # whoop-mcp was taken on PyPI; the install name, command, and repo all use whoop-mcp-server.
 name = "whoop-mcp-server"
-version = "0.0.11"
+version = "0.0.12"
 description = "Ask Claude or ChatGPT about your WHOOP data. Recovery, sleep, strain, and workout analysis computed from your own records."
 readme = "README.md"
 requires-python = ">=3.10"

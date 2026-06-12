@@ -6,13 +6,13 @@
     "url": "https://github.com/rajdeepmondaldotcom/whoop-mcp-server",
     "source": "github"
   },
-  "version": "0.0.11",
+  "version": "0.0.12",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "whoop-mcp-server",
-      "version": "0.0.11",
+      "version": "0.0.12",
       "transport": {
         "type": "stdio"
       },

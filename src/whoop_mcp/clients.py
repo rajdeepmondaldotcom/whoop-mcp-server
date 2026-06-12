@@ -159,7 +159,7 @@ def install_into(spec: ClientSpec, binary: str | None = None) -> tuple[Path, str
     action = "updated" if existing else "added"
     servers[SERVER_KEY] = desired
 
-    # Never let a corrupt original overwrite the last *good* backup — the
+    # Never let a corrupt original overwrite the last *good* backup - the
     # .json.broken copy above already preserves the corrupt bytes.
     if path.exists() and not original_corrupt:
         shutil.copy2(path, path.with_suffix(".json.bak"))

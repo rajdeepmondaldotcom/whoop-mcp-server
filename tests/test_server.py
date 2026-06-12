@@ -235,7 +235,7 @@ async def test_export_data_writes_files(session, tmp_path):
         await session.call_tool("export_data", {"start": "14 days ago", "end": "today"})
     )
     assert data["counts"]["cycles"] == 15  # 14 days ago .. today inclusive
-    # Every day's sleep must be present — including the FIRST day, whose sleep
+    # Every day's sleep must be present - including the FIRST day, whose sleep
     # started the evening before the window (the classic off-by-one-night bug).
     assert data["counts"]["sleeps"] == data["counts"]["cycles"]
 

@@ -2,8 +2,8 @@
 
 WHOOP's wire format is verbose (millisecond durations, kilojoules, repeated
 bookkeeping fields). These functions reshape records so a model gets exactly
-the numbers a coach would care about — hours of sleep, calories, heart-rate
-zones as minutes and percentages — while keeping ids and ISO timestamps so
+the numbers a coach would care about - hours of sleep, calories, heart-rate
+zones as minutes and percentages - while keeping ids and ISO timestamps so
 every value stays traceable. Timestamps are rendered in the record's own
 timezone, which is where the user actually was.
 """
@@ -298,7 +298,7 @@ def transform_sleep_stream(
 ) -> dict[str, Any]:
     """Summarize + downsample a granular in-sleep sensor stream.
 
-    Raw streams hold one point every few seconds — thousands of rows. The
+    Raw streams hold one point every few seconds - thousands of rows. The
     model gets per-bucket averages at ``resolution_minutes`` plus overnight
     statistics, which is what overnight HR/temperature questions need.
     """

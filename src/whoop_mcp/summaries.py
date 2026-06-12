@@ -1,7 +1,7 @@
 """Composite views over WHOOP data: daily summaries, weekly reports, trends.
 
-Everything here works on a :class:`Bundle` — one window of cycles,
-recoveries, sleeps, and workouts fetched concurrently — and buckets records
+Everything here works on a :class:`Bundle` - one window of cycles,
+recoveries, sleeps, and workouts fetched concurrently - and buckets records
 onto calendar days using each record's own ``timezone_offset``. Recoveries
 don't carry an offset, so they inherit the date of their cycle (falling back
 to their UTC creation date when the cycle isn't in the window).
@@ -179,7 +179,7 @@ def build_daily_summary(bundle: Bundle, day: date, *, today: date) -> dict[str, 
 
     if day == today and recovery is None:
         notes.append(
-            "Today's recovery is not available yet — WHOOP scores it after you wake up "
+            "Today's recovery is not available yet - WHOOP scores it after you wake up "
             "and sync."
         )
     if day == today and cycle is not None and cycle.get("end") is None:
@@ -600,7 +600,7 @@ def compare_aggregates(agg_a: dict[str, Any], agg_b: dict[str, Any]) -> dict[str
 
 
 def _daily_metric_table(bundle: Bundle, start: date, end: date) -> dict[date, dict[str, Any]]:
-    """One row per day joining recovery, sleep, and strain — the substrate for
+    """One row per day joining recovery, sleep, and strain - the substrate for
     correlations, records, and the health overview."""
     table: dict[date, dict[str, Any]] = {}
 
@@ -713,7 +713,7 @@ def build_personal_records(bundle: Bundle, start: date, end: date) -> dict[str, 
         day, value = (max if best else min)(rows, key=lambda pair: pair[1])
         return {"date": str(day), "value": rounded(value, 1)}
 
-    # Green-recovery streaks (>= 67%) — strictly consecutive calendar days; a
+    # Green-recovery streaks (>= 67%) - strictly consecutive calendar days; a
     # day without recovery data breaks the streak rather than bridging it.
     longest_streak = 0
     streak = 0

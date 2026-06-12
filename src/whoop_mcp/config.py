@@ -52,7 +52,7 @@ class Settings:
     log_level: str = "INFO"
     # Set via WHOOP_ACCESS_TOKEN to bypass OAuth entirely (no refresh; for testing).
     static_access_token: str | None = None
-    # WHOOP_MCP_DEMO=1 serves realistic generated data — no account needed.
+    # WHOOP_MCP_DEMO=1 serves realistic generated data - no account needed.
     demo_mode: bool = False
 
     @property

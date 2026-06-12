@@ -60,7 +60,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
     if not sys.stdin.isatty():
         print(
-            "error: `whoop-mcp setup` is interactive — run it in a terminal.\n"
+            "error: `whoop-mcp setup` is interactive - run it in a terminal.\n"
             "(For scripted setups use `whoop-mcp auth --client-id ... --client-secret ...`.)",
             file=sys.stderr,
         )
@@ -72,11 +72,11 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
     settings = load_settings()
 
-    # Step 1 — WHOOP app credentials.
+    # Step 1 - WHOOP app credentials.
     if settings.client_id and settings.client_secret:
-        print("✓ Step 1/4 — WHOOP app credentials already configured.\n")
+        print("✓ Step 1/4 - WHOOP app credentials already configured.\n")
     else:
-        print("Step 1/4 — WHOOP developer app (one time, ~2 minutes, free)\n")
+        print("Step 1/4 - WHOOP developer app (one time, ~2 minutes, free)\n")
         print("  1. Sign in with your normal WHOOP account and create a Team, then an App:")
         print("       https://developer-dashboard.whoop.com")
         print("  2. In the app settings:")
@@ -100,7 +100,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
         print(f"\n✓ Saved to {path} (0600 permissions).\n")
         settings = load_settings()
 
-    # Step 2 — authorize with WHOOP. Prefer a silent refresh over a browser trip.
+    # Step 2 - authorize with WHOOP. Prefer a silent refresh over a browser trip.
     store = TokenStore(settings.tokens_path)
     existing = store.load()
     authorized = bool(existing and not existing.expires_within(120))
@@ -111,19 +111,19 @@ def cmd_setup(args: argparse.Namespace) -> int:
                 refreshed.refresh_token = existing.refresh_token
             store.save(refreshed)
             authorized = True
-            print("✓ Step 2/4 — refreshed your existing WHOOP authorization.\n")
+            print("✓ Step 2/4 - refreshed your existing WHOOP authorization.\n")
         except WhoopError:
             authorized = False
     elif authorized:
-        print("✓ Step 2/4 — WHOOP account already connected.\n")
+        print("✓ Step 2/4 - WHOOP account already connected.\n")
     if not authorized:
-        print("Step 2/4 — Authorize with WHOOP (your browser will open)\n")
+        print("Step 2/4 - Authorize with WHOOP (your browser will open)\n")
         tokens = oauth.run_interactive_auth(settings)
         store.save(tokens)
         print(f"✓ Tokens saved to {settings.tokens_path}.\n")
 
-    # Step 3 — verify end to end.
-    print("Step 3/4 — Verifying with a live API call...")
+    # Step 3 - verify end to end.
+    print("Step 3/4 - Verifying with a live API call...")
 
     async def _verify() -> str:
         from whoop_mcp.client import WhoopClient
@@ -146,13 +146,13 @@ def cmd_setup(args: argparse.Namespace) -> int:
         line = f"Connected as {name or profile.get('user_id')}"
         if recoveries and (recoveries[0].get("score") or {}).get("recovery_score") is not None:
             score = recoveries[0]["score"]["recovery_score"]
-            line += f" — latest recovery {round(score)}% ({recovery_zone(score)})"
+            line += f" - latest recovery {round(score)}% ({recovery_zone(score)})"
         return line
 
     print(f"✓ {asyncio.run(_verify())}.\n")
 
-    # Step 4 — configure AI clients.
-    print("Step 4/4 — Connect your AI clients\n")
+    # Step 4 - configure AI clients.
+    print("Step 4/4 - Connect your AI clients\n")
     binary = clients.find_binary()
     configured_any = False
 
@@ -227,7 +227,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
             client_secret=settings.client_secret or "",
             redirect_uri=settings.redirect_uri,
         )
-        print(f"App credentials saved to {path} (0600) — future runs need no env vars.")
+        print(f"App credentials saved to {path} (0600) - future runs need no env vars.")
 
     # Verify end-to-end with a real API call.
     async def _verify() -> str:
@@ -248,7 +248,7 @@ def cmd_auth(args: argparse.Namespace) -> int:
         return name or f"user {profile.get('user_id')}"
 
     name = asyncio.run(_verify())
-    print(f"Connected to WHOOP as {name}. You're all set — add the server to your MCP client.")
+    print(f"Connected to WHOOP as {name}. You're all set - add the server to your MCP client.")
     return 0
 
 
@@ -285,7 +285,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     if settings.static_access_token:
         print("  tokens:        using WHOOP_ACCESS_TOKEN from environment")
     elif tokens is None:
-        print("  tokens:        none — run `whoop-mcp auth`")
+        print("  tokens:        none - run `whoop-mcp auth`")
     else:
         remaining = tokens.expires_at - time.time()
         when = datetime.fromtimestamp(tokens.expires_at, tz=timezone.utc).isoformat(
@@ -310,7 +310,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         mark = "ok " if ok else "FAIL"
         if not ok:
             problems += 1
-        print(f"  [{mark}] {label}" + (f" — {detail}" if detail else ""))
+        print(f"  [{mark}] {label}" + (f" - {detail}" if detail else ""))
 
     print("whoop-mcp doctor\n")
     check("python >= 3.10", sys.version_info >= (3, 10), sys.version.split()[0])
@@ -445,7 +445,7 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument(
         "--demo",
         action="store_true",
-        help="Serve realistic generated data — try everything without a WHOOP account",
+        help="Serve realistic generated data - try everything without a WHOOP account",
     )
     serve.set_defaults(func=cmd_serve)
 

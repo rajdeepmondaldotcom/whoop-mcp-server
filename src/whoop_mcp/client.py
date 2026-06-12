@@ -174,11 +174,11 @@ class WhoopClient:
         snippets = {
             400: "bad request",
             403: (
-                "forbidden — your WHOOP app is missing a scope for this data, or the "
+                "forbidden - your WHOOP app is missing a scope for this data, or the "
                 "WHOOP membership is inactive. Re-run `whoop-mcp auth` after enabling "
                 "all read scopes in the developer dashboard"
             ),
-            404: "not found — check the id",
+            404: "not found - check the id",
         }
         base = snippets.get(response.status_code, "unexpected response")
         body = response.text[:200].strip()
@@ -291,7 +291,7 @@ class WhoopClient:
         """Granular in-sleep sensor stream (heart rate, skin temperature).
 
         Present in WHOOP's OpenAPI spec but sparsely documented; some accounts
-        or app configurations may get 403/404 here — callers should degrade
+        or app configurations may get 403/404 here - callers should degrade
         gracefully.
         """
         return await self._get(f"/v2/activity/sleep/{sleep_id}/stream", ttl=PROFILE_TTL)

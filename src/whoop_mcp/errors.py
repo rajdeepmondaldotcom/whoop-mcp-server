@@ -17,7 +17,7 @@ class ConfigError(WhoopError):
 
 
 class AuthRequiredError(WhoopError):
-    """No usable WHOOP credentials — the user must (re)authorize.
+    """No usable WHOOP credentials - the user must (re)authorize.
 
     Raised when there are no stored tokens, or the refresh token has been
     revoked/expired and a browser re-authorization is needed.

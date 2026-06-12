@@ -8,7 +8,7 @@ labels: bug
 
 **What did you expect?**
 
-**Diagnostics** (paste the output — it never contains secrets):
+**Diagnostics** (paste the output, it never contains secrets):
 
 ```
 whoop-mcp doctor
@@ -16,7 +16,7 @@ whoop-mcp doctor
 
 **Setup**
 - OS:
-- MCP client (Claude Desktop / Claude Code / ChatGPT / Cursor / ...):
+- MCP client (Claude Desktop / Claude Code / ChatGPT / Cursor / other):
 - Install method (uv tool / pipx / source):
 
 **Does it reproduce in demo mode?** (`whoop-mcp serve --demo`) yes / no

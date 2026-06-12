@@ -4,7 +4,7 @@ WHOOP rotates *both* tokens on every refresh and invalidates the old ones,
 so this module is built around two rules:
 
 1. A refreshed token set is persisted to disk before anyone can use it.
-2. Refreshes are serialized behind an asyncio lock — concurrent tool calls
+2. Refreshes are serialized behind an asyncio lock - concurrent tool calls
    never race each other into burning the same refresh token twice.
 
 Access tokens are refreshed proactively (within ``EXPIRY_BUFFER_SECONDS`` of
@@ -142,7 +142,7 @@ class TokenManager:
 
         ``rejected`` is the token a request just got a 401 with. If the
         current token already differs, a concurrent caller refreshed in the
-        meantime and we hand that out instead of rotating again — WHOOP
+        meantime and we hand that out instead of rotating again - WHOOP
         invalidates the old pair on every refresh, so redundant rotations
         would knock out sibling requests' retries.
         """
@@ -162,7 +162,7 @@ class TokenManager:
                 if not tokens.refresh_token:
                     self._current = None
                     raise AuthRequiredError(
-                        "access token expired and no refresh token is available — "
+                        "access token expired and no refresh token is available - "
                         "make sure the `offline` scope is enabled"
                     )
                 logger.info("Refreshing WHOOP access token")
@@ -170,7 +170,7 @@ class TokenManager:
                     refreshed = await self._refresher(tokens.refresh_token)
                 except Exception:
                     # Drop the in-memory copy so the next attempt re-reads
-                    # tokens.json — a fresh `whoop-mcp auth` can then rescue a
+                    # tokens.json - a fresh `whoop-mcp auth` can then rescue a
                     # running server without a restart.
                     self._current = None
                     raise

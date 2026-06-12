@@ -4,7 +4,7 @@ Tool design notes:
 
 * Every tool is read-only and annotated as such.
 * Outputs are compact, transformed dicts (see :mod:`whoop_mcp.transform`)
-  rather than raw API passthrough — friendlier for models and much cheaper
+  rather than raw API passthrough - friendlier for models and much cheaper
   in tokens. Returning dicts also gives MCP clients structured content.
 * ``search`` and ``fetch`` implement the contract ChatGPT connectors
   require, mapping queries onto WHOOP records and day summaries.
@@ -98,7 +98,7 @@ Usage:
 - Date parameters accept: {DATE_FORMS}.
 
 If a tool reports that authorization is required: the user can either run
-`whoop-mcp setup` in a terminal, or — if they explicitly ask you to connect —
+`whoop-mcp setup` in a terminal, or - if they explicitly ask you to connect -
 call the connect_whoop_account tool, which opens their browser for WHOOP consent.
 Check get_connection_status when unsure."""
 
@@ -162,7 +162,7 @@ async def get_client() -> WhoopClient:
 def configure_for_testing(
     client: WhoopClient, tz: tzinfo | None = None, settings: Settings | None = None
 ) -> None:
-    """Inject a client (and optionally timezone/settings) — used by the test suite."""
+    """Inject a client (and optionally timezone/settings) - used by the test suite."""
     _state.client = client
     if tz is not None:
         _state.tz = tz
@@ -366,7 +366,7 @@ async def get_sleeps(
         if truncated and len(records) < limit:
             note = (
                 "The nap filter scanned only the newest records and may have missed "
-                "older main sleeps — narrow the date range for complete results."
+                "older main sleeps - narrow the date range for complete results."
             )
     records = records[:limit]
     return _collection_result([transform_sleep(r) for r in records], truncated, note)
@@ -417,7 +417,7 @@ async def get_workouts(
         if truncated and len(records) < limit:
             note += (
                 " The filter scanned only the newest records and may have missed older "
-                "matches — narrow the date range for complete results."
+                "matches - narrow the date range for complete results."
             )
     records = records[:limit]
     return _collection_result([transform_workout(r) for r in records], truncated, note)
@@ -521,7 +521,7 @@ async def get_recovery_trends(days: int = 30) -> dict[str, Any]:
 )
 async def get_sleep_trends(days: int = 30) -> dict[str, Any]:
     """Sleep trends over a window (7-180 days): hours slept, performance,
-    efficiency, consistency, and sleep debt — statistics, trend directions,
+    efficiency, consistency, and sleep debt - statistics, trend directions,
     unusual nights, and a nightly table. Naps are counted but excluded from
     nightly averages."""
     bundle, start_day, today = await _trend_bundle(days)
@@ -551,7 +551,7 @@ async def compare_periods(
     period_b_end: str,
 ) -> dict[str, Any]:
     """Compare two date ranges across recovery, HRV, resting heart rate, sleep,
-    strain, calories, and workout count — with per-metric change, percent
+    strain, calories, and workout count - with per-metric change, percent
     change, and an improved/declined/unchanged assessment. Period A is the
     baseline; period B is compared against it.
 
@@ -623,7 +623,7 @@ async def get_correlations(days: int = 90) -> dict[str, Any]:
     """How the user's metrics move together day-to-day (7-180 day window):
     strain vs next-morning recovery, sleep duration vs recovery, sleep
     consistency vs recovery, strain vs that night's sleep, HRV vs recovery.
-    Pearson r with strength labels and plain-English interpretations —
+    Pearson r with strength labels and plain-English interpretations -
     correlation, not causation."""
     bundle, start_day, today = await _trend_bundle(days)
     return build_correlations(bundle, start_day, today)
@@ -650,7 +650,7 @@ async def get_sleep_stream(sleep_id: str, resolution_minutes: int = 5) -> dict[s
     temperature curves (downsampled to resolution_minutes buckets) plus
     overnight stats like the lowest heart rate and when it happened. Get the
     sleep_id from get_sleeps, get_daily_summary, or a recovery record. WHOOP
-    does not expose this stream for every account/app — if unavailable, a
+    does not expose this stream for every account/app - if unavailable, a
     clear note is returned instead of an error."""
     client = await get_client()
     sleep = await client.sleep(sleep_id)
@@ -798,7 +798,7 @@ async def connect_whoop_account() -> dict[str, Any]:
             "connected": True,
             "mode": "demo",
             "note": (
-                "Demo mode is on — there is nothing to authorize. To connect a real "
+                "Demo mode is on - there is nothing to authorize. To connect a real "
                 "WHOOP account, run `whoop-mcp setup` in a terminal and restart the "
                 "server without --demo."
             ),
@@ -814,7 +814,7 @@ async def connect_whoop_account() -> dict[str, Any]:
                 "2. Enable every scope (read:recovery, read:cycles, read:sleep, read:workout, "
                 "read:profile, read:body_measurement, offline) and register the redirect URI "
                 f"{settings.redirect_uri}",
-                "3. Run `whoop-mcp setup` in a terminal and paste the Client ID/Secret — then "
+                "3. Run `whoop-mcp setup` in a terminal and paste the Client ID/Secret - then "
                 "ask me to connect again.",
             ],
         }
@@ -970,7 +970,7 @@ async def search(query: str) -> dict[str, Any]:
                 results.append(
                     {
                         "id": f"day:{cursor.isoformat()}",
-                        "title": f"{cursor.strftime('%a %b %d %Y')} — {' · '.join(pieces)}",
+                        "title": f"{cursor.strftime('%a %b %d %Y')} - {' · '.join(pieces)}",
                         "url": f"https://app.whoop.com/#whoop-mcp/day/{cursor.isoformat()}",
                     }
                 )
@@ -988,8 +988,8 @@ async def search(query: str) -> dict[str, Any]:
             results.append(
                 {
                     "id": f"workout:{workout.get('id')}",
-                    "title": f"{sport.title()} — {day.strftime('%a %b %d %Y')}"
-                    + (f" — {' · '.join(bits)}" if bits else ""),
+                    "title": f"{sport.title()} - {day.strftime('%a %b %d %Y')}"
+                    + (f" - {' · '.join(bits)}" if bits else ""),
                     "url": f"https://app.whoop.com/#whoop-mcp/workout/{workout.get('id')}",
                 }
             )
@@ -1004,8 +1004,8 @@ async def search(query: str) -> dict[str, Any]:
             results.append(
                 {
                     "id": f"sleep:{sleep.get('id')}",
-                    "title": f"{kind} — {day.strftime('%a %b %d %Y')}"
-                    + (f" — {duration} in bed" if duration else ""),
+                    "title": f"{kind} - {day.strftime('%a %b %d %Y')}"
+                    + (f" - {duration} in bed" if duration else ""),
                     "url": f"https://app.whoop.com/#whoop-mcp/sleep/{sleep.get('id')}",
                 }
             )
@@ -1042,16 +1042,16 @@ async def fetch(id: str) -> dict[str, Any]:
         except ValueError:
             raise bad_id("the date must be YYYY-MM-DD") from None
         document = await _daily(day)
-        title = f"WHOOP day summary — {day.strftime('%a %b %d %Y')}"
+        title = f"WHOOP day summary - {day.strftime('%a %b %d %Y')}"
         metadata = {"type": "day_summary", "date": rest}
     elif kind == "sleep":
         document = transform_sleep(await client.sleep(rest))
-        title = f"Sleep — {document.get('date', rest)}"
+        title = f"Sleep - {document.get('date', rest)}"
         metadata = {"type": "sleep", "date": str(document.get("date", ""))}
     elif kind == "workout":
         document = transform_workout(await client.workout(rest))
         sport = str(document.get("sport", "workout")).title()
-        title = f"{sport} — {document.get('date', rest)}"
+        title = f"{sport} - {document.get('date', rest)}"
         metadata = {"type": "workout", "date": str(document.get("date", ""))}
     elif kind in ("cycle", "recovery"):
         try:
@@ -1060,11 +1060,11 @@ async def fetch(id: str) -> dict[str, Any]:
             raise bad_id("the cycle id must be an integer") from None
         if kind == "cycle":
             document = transform_cycle(await client.cycle(cycle_id))
-            title = f"Cycle — {document.get('date', rest)}"
+            title = f"Cycle - {document.get('date', rest)}"
             metadata = {"type": "cycle", "date": str(document.get("date", ""))}
         else:
             document = transform_recovery(await client.cycle_recovery(cycle_id))
-            title = f"Recovery — cycle {rest}"
+            title = f"Recovery - cycle {rest}"
             metadata = {"type": "recovery", "cycle_id": rest}
     else:
         raise bad_id("unknown document type")
@@ -1126,7 +1126,7 @@ def morning_readiness() -> str:
         "then: 1) interpret my recovery score, HRV, and resting heart rate against "
         "my recent baseline (get_recovery_trends with days=14 if useful), 2) assess "
         "last night's sleep quality and any sleep debt, and 3) recommend how hard I "
-        "should push today — training intensity, and one concrete thing to do for "
+        "should push today - training intensity, and one concrete thing to do for "
         "recovery. Be direct and specific, not generic."
     )
 
@@ -1151,7 +1151,7 @@ def sleep_coach(days: str = "14") -> str:
         "get_daily_summary for today. Analyze duration vs my sleep need, "
         "efficiency, consistency (bed/wake time regularity), and debt. Identify "
         "my worst nights and what they had in common, then give me a prioritized, "
-        "specific action list — times, not platitudes."
+        "specific action list - times, not platitudes."
     )
 
 

@@ -14,9 +14,10 @@ venv/
 .coverage
 htmlcov/
 
-# Local environment & secrets — never commit credentials
+# Local environment & secrets, never commit credentials
 .env
 *.local
+*.local.md
 tokens.json
 config.json
 

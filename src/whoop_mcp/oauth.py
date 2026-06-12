@@ -152,7 +152,7 @@ def _make_handler(result: _CallbackResult, expected_path: str):
 
         def log_message(self, format: str, *args) -> None:  # noqa: A002
             # The request line carries the one-time authorization code in its
-            # query string — log only the path, never the args.
+            # query string - log only the path, never the args.
             logger.debug("callback server: handled %s", self.path.partition("?")[0])
 
     return CallbackHandler
@@ -198,7 +198,7 @@ async def authorize_interactive_async(
     on_url: Callable[[str], None] | None = None,
 ) -> TokenSet:
     """Browser authorization flow, safe inside a running event loop (and a
-    running MCP server — nothing here writes to stdout)."""
+    running MCP server - nothing here writes to stdout)."""
     server, result, state, url = _start_callback_server(settings)
     try:
         if on_url is not None:
@@ -233,7 +233,7 @@ async def authorize_interactive_async(
         raise WhoopError("WHOOP redirect did not include an authorization code.")
     if result.state != state:
         raise WhoopError(
-            "OAuth state mismatch — the redirect did not come from the request we "
+            "OAuth state mismatch - the redirect did not come from the request we "
             "started. Start the authorization again."
         )
 

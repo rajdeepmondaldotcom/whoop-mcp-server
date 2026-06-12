@@ -9,7 +9,7 @@ Two distinct concerns live here:
 
 * Bucketing WHOOP records onto calendar days. Every cycle/sleep/workout
   record carries its own ``timezone_offset`` (where the user physically was),
-  so day attribution uses the record's offset — not UTC and not the current
+  so day attribution uses the record's offset - not UTC and not the current
   machine zone. A sleep belongs to the local day you woke up; cycles and
   workouts belong to the local day they started.
 """

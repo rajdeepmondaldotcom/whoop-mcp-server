@@ -1,13 +1,13 @@
 """Full-history export of WHOOP data to local files.
 
-Fetches every record in a date range — chunked into windows so pagination
-caps are never hit, deduplicated across chunk boundaries — and writes:
+Fetches every record in a date range - chunked into windows so pagination
+caps are never hit, deduplicated across chunk boundaries - and writes:
 
-* ``data.json``  — everything, transformed (and optionally the raw API
+* ``data.json``  - everything, transformed (and optionally the raw API
   records), suitable for re-analysis or archival
-* ``daily_summary.csv`` — one row per day (recovery, HRV, RHR, sleep,
+* ``daily_summary.csv`` - one row per day (recovery, HRV, RHR, sleep,
   strain, calories, workouts), spreadsheet-ready
-* ``workouts.csv`` — one row per workout
+* ``workouts.csv`` - one row per workout
 
 Nothing leaves the machine; files land under the data directory.
 """
@@ -146,7 +146,7 @@ async def run_export(
 ) -> dict[str, Any]:
     began = time.monotonic()
     # Pad the fetch by a day each side: WHOOP filters on record *start*, but a
-    # night's sleep belongs to the wake-up day — without padding, the first
+    # night's sleep belongs to the wake-up day - without padding, the first
     # morning's sleep (started the previous evening) would be missing.
     bundle, truncated, rate_limited = await _fetch_everything(
         client, start - timedelta(days=1), end + timedelta(days=1)

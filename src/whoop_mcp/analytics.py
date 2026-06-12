@@ -8,7 +8,7 @@ this module is strict about:
   arrive newest-first; regressing over arrival order silently flips every
   trend direction.
 * Direction labels respect metric polarity. A rising HRV is improvement; a
-  rising resting heart rate is not. Strain is neutral — more is not better
+  rising resting heart rate is not. Strain is neutral - more is not better
   or worse, so it gets "increasing/decreasing" rather than a judgment.
 """
 
@@ -167,11 +167,11 @@ def acute_chronic_ratio(daily_strain: dict[date, float], today: date) -> dict[st
         return None
     ratio = acute / chronic
     if ratio >= 1.5:
-        note = "much higher load than usual — elevated injury/overreach risk"
+        note = "much higher load than usual - elevated injury/overreach risk"
     elif ratio >= 1.2:
         note = "training load is ramping up faster than your 4-week base"
     elif ratio <= 0.8:
-        note = "lighter week than your recent base — good for recovery, watch detraining"
+        note = "lighter week than your recent base - good for recovery, watch detraining"
     else:
         note = "training load is balanced against your 4-week base"
     return {

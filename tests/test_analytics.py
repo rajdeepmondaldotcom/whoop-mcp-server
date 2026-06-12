@@ -39,7 +39,7 @@ def test_rising_recovery_is_improving():
 
 
 def test_rising_resting_heart_rate_is_declining():
-    # Same rising shape, but for RHR higher is worse — polarity must flip it.
+    # Same rising shape, but for RHR higher is worse - polarity must flip it.
     out = describe_series("resting_heart_rate", series([50, 52, 54, 56, 58, 60, 62]))
     assert out["trend"]["direction"] == "declining"
 

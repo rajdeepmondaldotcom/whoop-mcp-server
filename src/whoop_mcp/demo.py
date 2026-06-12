@@ -2,7 +2,7 @@
 
 ``whoop-mcp serve --demo`` (or ``WHOOP_MCP_DEMO=1``) serves 150 days of
 generated data through the exact same client/transform/analytics pipeline as
-real data — no WHOOP account, no developer app, no OAuth. It exists so
+real data - no WHOOP account, no developer app, no OAuth. It exists so
 anyone can try the server in 30 seconds before committing to setup.
 
 The dataset is deterministic for a given calendar day and deliberately
@@ -414,7 +414,7 @@ class DemoWhoop:
 
 
 class DemoTokens:
-    """Token provider for demo mode — no OAuth anywhere."""
+    """Token provider for demo mode - no OAuth anywhere."""
 
     async def get_access_token(
         self, *, force_refresh: bool = False, rejected: str | None = None

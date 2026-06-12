@@ -16,8 +16,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Test
+        # setup-uv (with python-version) already creates and activates .venv
         run: |
-          uv venv
           uv pip install -e ".[dev]"
           uv run ruff check .
           uv run pytest

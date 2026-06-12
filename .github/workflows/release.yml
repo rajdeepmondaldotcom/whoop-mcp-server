@@ -65,7 +65,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "v${{ steps.version.outputs.version }}" dist/* \
-            --title "whoop-mcp v${{ steps.version.outputs.version }}" \
+            --title "whoop-mcp-server v${{ steps.version.outputs.version }}" \
             --generate-notes
 
       - name: Check for PyPI token

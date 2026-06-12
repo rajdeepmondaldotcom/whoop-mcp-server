@@ -1,6 +1,6 @@
 # Security policy
 
-whoop-mcp handles personal health data and OAuth credentials, so security
+whoop-mcp-server handles personal health data and OAuth credentials, so security
 reports get priority over everything else.
 
 ## Reporting

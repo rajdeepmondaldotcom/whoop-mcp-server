@@ -1,6 +1,6 @@
 # Things to ask once WHOOP is connected
 
-Copy any of these into Claude, ChatGPT, Cursor, or wherever you've connected whoop-mcp. The model picks the right tools on its own.
+Copy any of these into Claude, ChatGPT, Cursor, or wherever you've connected whoop-mcp-server. The model picks the right tools on its own.
 
 ## Every morning
 

@@ -1,6 +1,6 @@
 <!-- mcp-name: io.github.rajdeepmondaldotcom/whoop-mcp -->
 
-# whoop-mcp
+# whoop-mcp-server
 
 Your WHOOP shows you charts. It can't answer "should I train hard today" or "what actually hurts my recovery". This server can.
 

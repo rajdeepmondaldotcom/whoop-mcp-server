@@ -1,6 +1,6 @@
 # Privacy policy
 
-whoop-mcp is open source software you run on your own computer. This page
+whoop-mcp-server is open source software you run on your own computer. This page
 describes how it handles your data. The short version: your data stays with
 you.
 

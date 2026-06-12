@@ -10,7 +10,10 @@ from __future__ import annotations
 import argparse
 import asyncio
 import getpass
+import json
 import logging
+import platform
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -49,6 +52,60 @@ def _apply_overrides(settings: Settings, args: argparse.Namespace) -> Settings:
 
 
 # ---------------------------------------------------------------- commands
+
+
+def _claude_desktop_running() -> bool:
+    if platform.system() != "Darwin":
+        return False
+    result = subprocess.run(["pgrep", "-x", "Claude"], capture_output=True)
+    return result.returncode == 0
+
+
+def _ensure_claude_desktop_closed() -> None:
+    """Claude Desktop rewrites its config file when it quits, wiping edits
+    made while it was open. Setup must not write the config behind its back."""
+    if not _claude_desktop_running():
+        return
+    print("  Claude Desktop is running. It overwrites config edits when it quits,")
+    print("  so it must be closed before setup can configure it safely.")
+    answer = input("  Quit Claude Desktop now? [Y/n] ")
+    if answer.strip().lower() in ("n", "no"):
+        print("  Skipping Claude Desktop config to avoid losing the edit.")
+        return
+    subprocess.run(["osascript", "-e", 'quit app "Claude"'], capture_output=True, timeout=15)
+    for _ in range(20):
+        if not _claude_desktop_running():
+            print("  ✓ Claude Desktop closed.")
+            return
+        time.sleep(0.5)
+    print("  Could not confirm it closed. Quit it manually, then re-run setup.")
+
+
+def _verify_stdio_boot(binary: str) -> bool:
+    """Launch the exact configured command and confirm it answers an MCP
+    initialize request over stdio."""
+    request = (
+        json.dumps(
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2025-06-18",
+                    "capabilities": {},
+                    "clientInfo": {"name": "whoop-mcp-setup", "version": "0"},
+                },
+            }
+        )
+        + "\n"
+    )
+    try:
+        proc = subprocess.run(
+            [binary, "serve"], input=request, capture_output=True, text=True, timeout=20
+        )
+    except (subprocess.TimeoutExpired, OSError):
+        return False
+    return '"serverInfo"' in proc.stdout
 
 
 def cmd_setup(args: argparse.Namespace) -> int:
@@ -157,7 +214,11 @@ def cmd_setup(args: argparse.Namespace) -> int:
     configured_any = False
 
     if not args.skip_clients:
+        _ensure_claude_desktop_closed()
         for spec in clients.detected_clients():
+            if spec.key == "claude-desktop" and _claude_desktop_running():
+                print("  Skipping Claude Desktop (still running).")
+                continue
             answer = input(f"  {spec.name} detected. Add whoop-mcp to it now? [Y/n] ")
             if answer.strip().lower() in ("n", "no"):
                 continue
@@ -168,6 +229,13 @@ def cmd_setup(args: argparse.Namespace) -> int:
             else:
                 print(f"  ✓ {spec.name}: {action} in {path} (backup written)")
                 print(f"    → {spec.restart_hint}")
+
+        if configured_any:
+            print("\n  Verifying the configured server boots...")
+            if _verify_stdio_boot(binary):
+                print("  ✓ Verified: the server answers over stdio.")
+            else:
+                print("  ✗ The configured command failed to start. Run `whoop-mcp doctor`.")
 
         if clients.claude_code_detected():
             command = clients.claude_code_command(binary)
@@ -196,7 +264,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
         print("    ChatGPT → Settings → Apps & Connectors → Developer mode.")
 
     print("\n┌────────────────────────────────────────────────────────────────┐")
-    print("│ Done. Try asking your AI:                                      │")
+    print("│ Done. Open (or fully restart) your AI app, then try:           │")
     print('│   "How did I sleep last night?"                                │')
     print('│   "Give me a full overview of my health this quarter."         │')
     print("└────────────────────────────────────────────────────────────────┘")

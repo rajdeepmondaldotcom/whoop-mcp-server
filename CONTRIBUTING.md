@@ -5,7 +5,7 @@ Thanks for helping make whoop-mcp better. The bar is simple: data correctness ov
 ## Dev setup
 
 ```bash
-git clone https://github.com/rajdeepmondaldotcom/whoop-mcp.git && cd whoop-mcp
+git clone https://github.com/rajdeepmondaldotcom/whoop-mcp-server.git && cd whoop-mcp
 uv venv && uv pip install -e ".[dev]"
 .venv/bin/pytest          # all offline, faked WHOOP API
 .venv/bin/ruff check .

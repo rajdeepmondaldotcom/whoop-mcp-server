@@ -25,16 +25,26 @@ SERVER_KEY = "whoop"
 
 
 def find_binary() -> str:
-    """Absolute path to the installed ``whoop-mcp`` command."""
+    """Absolute path to the installed ``whoop-mcp`` command.
+
+    Deliberately does NOT resolve symlinks: launcher paths like
+    ``~/.local/bin/whoop-mcp`` are stable across upgrades and reinstalls,
+    while the versioned tool directory they point at is not. Writing a
+    resolved path into client configs breaks every config on the next
+    reinstall.
+    """
     on_path = shutil.which("whoop-mcp")
     if on_path:
-        return str(Path(on_path).resolve())
-    candidate = Path(sys.argv[0]).resolve()
-    if candidate.name == "whoop-mcp" and candidate.exists():
+        return str(Path(on_path).absolute())
+    launcher = Path.home() / ".local" / "bin" / "whoop-mcp"
+    if launcher.exists():
+        return str(launcher)
+    candidate = Path(sys.argv[0]).absolute()
+    if candidate.name in ("whoop-mcp", "whoop-mcp-server") and candidate.exists():
         return str(candidate)
     sibling = Path(sys.executable).parent / "whoop-mcp"
     if sibling.exists():
-        return str(sibling.resolve())
+        return str(sibling.absolute())
     return "whoop-mcp"  # hope it's on the client's PATH
 
 

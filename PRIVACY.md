@@ -41,6 +41,6 @@ WHOOP account settings.
 ## Contact
 
 Questions: rajdeep@rajdeepmondal.com or open an issue at
-https://github.com/rajdeepmondaldotcom/whoop-mcp/issues.
+https://github.com/rajdeepmondaldotcom/whoop-mcp-server/issues.
 
 Last updated: June 12, 2026.

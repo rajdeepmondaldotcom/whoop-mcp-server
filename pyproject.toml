@@ -24,8 +24,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rajdeepmondaldotcom/whoop-mcp"
-Issues = "https://github.com/rajdeepmondaldotcom/whoop-mcp/issues"
+Homepage = "https://github.com/rajdeepmondaldotcom/whoop-mcp-server"
+Issues = "https://github.com/rajdeepmondaldotcom/whoop-mcp-server/issues"
 
 [project.scripts]
 whoop-mcp = "whoop_mcp.cli:main"

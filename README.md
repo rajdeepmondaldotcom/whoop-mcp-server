@@ -6,8 +6,8 @@ Your WHOOP shows you charts. It can't answer "should I train hard today" or "wha
 
 It connects your WHOOP data to Claude, ChatGPT, and any MCP client. You ask in plain English. It computes the answer from your own records and lets the AI explain it.
 
-[![CI](https://github.com/rajdeepmondaldotcom/whoop-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rajdeepmondaldotcom/whoop-mcp/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/rajdeepmondaldotcom/whoop-mcp)
+[![CI](https://github.com/rajdeepmondaldotcom/whoop-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/rajdeepmondaldotcom/whoop-mcp-server/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/rajdeepmondaldotcom/whoop-mcp-server)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MCP](https://img.shields.io/badge/protocol-MCP-8A2BE2)](https://modelcontextprotocol.io)
 
@@ -142,7 +142,7 @@ Nothing required after `whoop-mcp setup`. Overrides, in priority order: process 
 
 Read-only against WHOOP. Tokens stored locally with 0600 permissions. The only writes are local files you ask for (`export_data`) and the OAuth flow you trigger. One thing worth knowing: aggregates like trends and correlations can reveal more about you than single records. Connect this only to AI clients you trust with health data. Full policy: [PRIVACY.md](PRIVACY.md). Vulnerabilities: [SECURITY.md](SECURITY.md).
 
-The WHOOP developer dashboard asks for a privacy policy URL when you create your app. Use this repo's policy: `https://github.com/rajdeepmondaldotcom/whoop-mcp/blob/main/PRIVACY.md` (or your own).
+The WHOOP developer dashboard asks for a privacy policy URL when you create your app. Use this repo's policy: `https://github.com/rajdeepmondaldotcom/whoop-mcp-server/blob/main/PRIVACY.md` (or your own).
 
 ## Contributing
 
@@ -162,7 +162,7 @@ The whole test suite runs offline. [CONTRIBUTING.md](CONTRIBUTING.md) lists the 
 | Tools missing in a client | Re-run `whoop-mcp setup`, then fully restart the client |
 | No recovery shown today | WHOOP scores it after you wake and sync. The summary says so |
 | Sleep stream "not available" | WHOOP doesn't expose it for every account. Nightly summaries still work |
-| Anything else | `whoop-mcp doctor`, or `get_connection_status` from chat, or [open an issue](https://github.com/rajdeepmondaldotcom/whoop-mcp/issues) |
+| Anything else | `whoop-mcp doctor`, or `get_connection_status` from chat, or [open an issue](https://github.com/rajdeepmondaldotcom/whoop-mcp-server/issues) |
 
 ## License
 

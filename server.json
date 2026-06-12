@@ -3,7 +3,7 @@
   "name": "io.github.rajdeepmondaldotcom/whoop-mcp",
   "description": "WHOOP recovery, sleep, strain, and workouts for any AI. Analysis tools, demo mode, fast setup.",
   "repository": {
-    "url": "https://github.com/rajdeepmondaldotcom/whoop-mcp",
+    "url": "https://github.com/rajdeepmondaldotcom/whoop-mcp-server",
     "source": "github"
   },
   "version": "0.0.3",

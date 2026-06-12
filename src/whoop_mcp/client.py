@@ -94,7 +94,7 @@ class WhoopClient:
             base_url=base_url,
             timeout=timeout,
             transport=transport,
-            headers={"User-Agent": "whoop-mcp (+https://github.com/rajdeepmondaldotcom/whoop-mcp)"},
+            headers={"User-Agent": "whoop-mcp (+https://github.com/rajdeepmondaldotcom/whoop-mcp-server)"},
         )
         self._cache = _TTLCache()
 

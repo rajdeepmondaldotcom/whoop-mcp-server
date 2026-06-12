@@ -1,5 +1,6 @@
 [project]
-name = "whoop-mcp"
+# PyPI package name; the CLI command stays `whoop-mcp` (whoop-mcp was taken on PyPI).
+name = "whoop-mcp-server"
 version = "0.0.1"
 description = "Ask Claude or ChatGPT about your WHOOP data. Recovery, sleep, strain, and workout analysis computed from your own records."
 readme = "README.md"
@@ -28,6 +29,8 @@ Issues = "https://github.com/rajdeepmondaldotcom/whoop-mcp/issues"
 
 [project.scripts]
 whoop-mcp = "whoop_mcp.cli:main"
+# Alias matching the PyPI name so `uvx whoop-mcp-server` just works.
+whoop-mcp-server = "whoop_mcp.cli:main"
 
 [project.optional-dependencies]
 dev = [

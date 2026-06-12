@@ -16,21 +16,15 @@ The version lives in `pyproject.toml` (mirrored in
 - For a minor or major bump, edit the version in those three files yourself
   and push. The workflow releases exactly what you set.
 
-## One-time setup still needed
+## PyPI
 
-PyPI publishing waits on a token:
+The package publishes as `whoop-mcp-server` (the name `whoop-mcp` was
+already taken on PyPI). The CLI command stays `whoop-mcp`, with a
+`whoop-mcp-server` alias so `uvx whoop-mcp-server` works.
 
-1. Create an account-scoped API token at pypi.org (Account settings, API
-   tokens). Account-scoped, because the project doesn't exist yet.
-2. `gh secret set PYPI_API_TOKEN` and paste it.
-
-The next push to main publishes to PyPI, and the MCP Registry job runs
-right after it. Once the first PyPI release is live, you can swap the
-account token for a project-scoped one.
-
-## After the first PyPI release
-
-Update the README install line from the git URL to `uvx whoop-mcp`.
+The `PYPI_API_TOKEN` repo secret powers the publish step. Once the project
+exists on PyPI, you can swap the account-scoped token for one scoped to
+`whoop-mcp-server`.
 
 ## After SDK 2.0
 

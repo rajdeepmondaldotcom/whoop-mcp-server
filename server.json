@@ -11,7 +11,7 @@
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
-      "identifier": "whoop-mcp",
+      "identifier": "whoop-mcp-server",
       "version": "0.0.1",
       "transport": {
         "type": "stdio"

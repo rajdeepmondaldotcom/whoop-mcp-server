@@ -23,22 +23,24 @@ Runs on your machine. Read-only. The only network peer is api.prod.whoop.com. No
 
 ## Try it in 30 seconds
 
-You don't need a WHOOP account to see it work. Demo mode serves 150 days of realistic generated data through the exact pipeline real data uses.
+You don't need a WHOOP account to see it work. Demo mode serves 150 days of realistic generated data through the exact pipeline real data uses. One line, nothing to install:
 
 ```bash
-uv tool install git+https://github.com/rajdeepmondaldotcom/whoop-mcp
-claude mcp add whoop-demo -- whoop-mcp serve --demo
+claude mcp add whoop-demo -- uvx whoop-mcp-server serve --demo
 ```
 
 Ask "how did I sleep last week?" and watch. The patterns in the demo data are real: hard training days dent the next morning's recovery, and the correlation tool finds it.
 
 ## Connect your WHOOP
 
-One command. About 3 minutes, most of it WHOOP's consent screen.
+Two commands. About 3 minutes, most of it WHOOP's consent screen.
 
 ```bash
+uv tool install whoop-mcp-server    # puts the whoop-mcp command on your PATH
 whoop-mcp setup
 ```
+
+(No `uv`? `pipx install whoop-mcp-server` works too.)
 
 The wizard walks you through WHOOP's free developer app (it opens the dashboard and tells you exactly what to click), runs the OAuth in your browser, proves the connection with a live API call, then configures Claude Desktop, Cursor, Windsurf, VS Code, and Claude Code for you. Existing configs are backed up before any edit.
 

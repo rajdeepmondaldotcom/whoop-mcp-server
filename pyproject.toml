@@ -1,6 +1,6 @@
 [project]
 name = "whoop-mcp"
-version = "1.0.0"
+version = "0.0.1"
 description = "Ask Claude or ChatGPT about your WHOOP data. Recovery, sleep, strain, and workout analysis computed from your own records."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -8,7 +8,7 @@ license = "MIT"
 authors = [{ name = "Rajdeep Mondal", email = "rajdeep@rajdeepmondal.com" }]
 keywords = ["whoop", "mcp", "model-context-protocol", "health", "fitness", "claude", "chatgpt"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",

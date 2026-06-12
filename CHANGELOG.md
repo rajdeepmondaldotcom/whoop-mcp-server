@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.0.0 (2026-06-12)
+## 0.0.1 (2026-06-12)
 
-First stable release.
+First release.
 
 ### Data coverage
 - Every read endpoint in WHOOP API v2: cycles, recoveries, sleeps, workouts,

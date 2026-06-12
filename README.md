@@ -138,7 +138,9 @@ Nothing required after `whoop-mcp setup`. Overrides, in priority order: process 
 
 ## Privacy
 
-Read-only against WHOOP. Tokens stored locally with 0600 permissions. The only writes are local files you ask for (`export_data`) and the OAuth flow you trigger. One thing worth knowing: aggregates like trends and correlations can reveal more about you than single records. Connect this only to AI clients you trust with health data. Vulnerabilities: [SECURITY.md](SECURITY.md).
+Read-only against WHOOP. Tokens stored locally with 0600 permissions. The only writes are local files you ask for (`export_data`) and the OAuth flow you trigger. One thing worth knowing: aggregates like trends and correlations can reveal more about you than single records. Connect this only to AI clients you trust with health data. Full policy: [PRIVACY.md](PRIVACY.md). Vulnerabilities: [SECURITY.md](SECURITY.md).
+
+The WHOOP developer dashboard asks for a privacy policy URL when you create your app. Use this repo's policy: `https://github.com/rajdeepmondaldotcom/whoop-mcp/blob/main/PRIVACY.md` (or your own).
 
 ## Contributing
 

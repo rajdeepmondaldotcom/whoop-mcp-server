@@ -1,39 +1,36 @@
 # Releasing
 
-Technical steps for cutting a release. Maintainer only.
+Releases are automatic. Every push to `main` runs tests, tags a version,
+creates a GitHub release with built artifacts, publishes to PyPI, and lists
+the new version in the MCP Registry.
 
-## PyPI (one-time setup)
+## How versioning works
 
-1. Create the `whoop-mcp` project on PyPI. In its settings, add a trusted
-   publisher: owner `rajdeepmondaldotcom`, repo `whoop-mcp`, workflow
-   `release.yml`, environment `pypi`.
-2. Create the `pypi` environment in the GitHub repo settings.
-3. Set the repo variable `PYPI_PUBLISH` to `true`:
-   `gh variable set PYPI_PUBLISH -b true`
+The version lives in `pyproject.toml` (mirrored in
+`src/whoop_mcp/__init__.py` and `server.json`).
 
-## Cutting a release
+- If the current version has no tag yet, the workflow tags and releases it
+  as-is. That's how 0.0.1 went out.
+- If it's already tagged, the workflow bumps the patch number (0.0.1 to
+  0.0.2), commits `release: vX.Y.Z`, tags, and releases.
+- For a minor or major bump, edit the version in those three files yourself
+  and push. The workflow releases exactly what you set.
 
-1. Bump the version in `pyproject.toml`, `src/whoop_mcp/__init__.py`, and
-   `server.json`. Add a `CHANGELOG.md` entry.
-2. Commit, then tag and push:
+## One-time setup still needed
 
-```bash
-git tag -a vX.Y.Z -m "whoop-mcp X.Y.Z"
-git push origin main vX.Y.Z
-```
+PyPI publishing waits on a token:
 
-The release workflow runs tests, builds the package, creates the GitHub
-release with artifacts, and publishes to PyPI when `PYPI_PUBLISH` is set.
+1. Create an account-scoped API token at pypi.org (Account settings, API
+   tokens). Account-scoped, because the project doesn't exist yet.
+2. `gh secret set PYPI_API_TOKEN` and paste it.
 
-## MCP Registry
+The next push to main publishes to PyPI, and the MCP Registry job runs
+right after it. Once the first PyPI release is live, you can swap the
+account token for a project-scoped one.
 
-Requires the PyPI package to exist. `server.json` is in the repo and the
-README carries the required `mcp-name` marker.
+## After the first PyPI release
 
-```bash
-mcp-publisher login github
-mcp-publisher publish
-```
+Update the README install line from the git URL to `uvx whoop-mcp`.
 
 ## After SDK 2.0
 

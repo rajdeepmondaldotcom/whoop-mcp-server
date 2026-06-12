@@ -2,51 +2,109 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+
+# One release at a time; later pushes queue.
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
-  build:
+  release:
+    # Skip the version-bump commits this workflow pushes itself.
+    if: "!startsWith(github.event.head_commit.message, 'release:')"
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      published: ${{ steps.pypi_check.outputs.has_token }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
       - name: Test
-        # setup-uv (with python-version) already creates and activates .venv
         run: |
           uv pip install -e ".[dev]"
           uv run ruff check .
           uv run pytest
+
+      - name: Determine and tag version
+        id: version
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          VERSION=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            # Current version already released: bump the patch number.
+            NEW=$(echo "$VERSION" | awk -F. '{printf "%d.%d.%d", $1, $2, $3 + 1}')
+            sed -i "s/^version = \"$VERSION\"/version = \"$NEW\"/" pyproject.toml
+            sed -i "s/__version__ = \"$VERSION\"/__version__ = \"$NEW\"/" src/whoop_mcp/__init__.py
+            sed -i "s/\"version\": \"$VERSION\"/\"version\": \"$NEW\"/g" server.json
+            git commit -am "release: v$NEW"
+            git tag "v$NEW"
+            git push origin main "v$NEW"
+            VERSION="$NEW"
+          else
+            # First release of the version already in pyproject.toml.
+            git tag "v$VERSION"
+            git push origin "v$VERSION"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: uv build
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" dist/* \
-            --title "whoop-mcp ${GITHUB_REF_NAME}" \
+          gh release create "v${{ steps.version.outputs.version }}" dist/* \
+            --title "whoop-mcp v${{ steps.version.outputs.version }}" \
             --generate-notes
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
 
-  publish-pypi:
-    # Skipped until PyPI "trusted publishing" is configured (see RELEASING.md):
-    # set the repo variable PYPI_PUBLISH=true to enable this job.
-    if: vars.PYPI_PUBLISH == 'true'
-    needs: build
+      - name: Check for PyPI token
+        id: pypi_check
+        env:
+          TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::PYPI_API_TOKEN is not set, so the PyPI publish was skipped. One-time setup: create an API token at pypi.org, then run: gh secret set PYPI_API_TOKEN"
+          fi
+      - name: Publish to PyPI
+        if: steps.pypi_check.outputs.has_token == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  registry:
+    # Lists the new version in the official MCP Registry. Needs the package
+    # live on PyPI, so this only runs after a real PyPI publish.
+    needs: release
+    if: needs.release.outputs.published == 'true'
     runs-on: ubuntu-latest
-    environment: pypi
     permissions:
       id-token: write
+      contents: read
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          name: dist
-          path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+          ref: main
+      - name: Wait for PyPI to serve the new version
+        run: sleep 60
+      - name: Publish to MCP Registry
+        continue-on-error: true
+        run: |
+          curl -sL -o mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz"
+          tar xzf mcp-publisher.tar.gz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish

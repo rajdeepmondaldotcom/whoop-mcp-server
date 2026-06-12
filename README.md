@@ -30,11 +30,12 @@ Your data never leaves your machine. Read-only. No telemetry. MIT.
 ## Try it in 30 seconds — no WHOOP account needed
 
 ```bash
-git clone https://github.com/rajdeepmondaldotcom/whoop-mcp.git && cd whoop-mcp
-uv tool install .            # or: pipx install .
+uv tool install git+https://github.com/rajdeepmondaldotcom/whoop-mcp
 ```
 
-<!-- TODO once on PyPI, this whole block becomes: uvx whoop-mcp setup -->
+(No `uv`? `pipx install git+https://github.com/rajdeepmondaldotcom/whoop-mcp` — or clone and `uv tool install .`)
+
+<!-- TODO once on PyPI, this becomes: uvx whoop-mcp setup -->
 
 Add to Claude Desktop (or any client) in **demo mode** and start asking:
 

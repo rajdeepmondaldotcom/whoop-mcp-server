@@ -35,8 +35,9 @@ jobs:
           path: dist/
 
   publish-pypi:
-    # Requires PyPI "trusted publishing" to be configured for this repo
-    # (see RELEASING.md). Safe to leave enabled: it simply fails without it.
+    # Skipped until PyPI "trusted publishing" is configured (see RELEASING.md):
+    # set the repo variable PYPI_PUBLISH=true to enable this job.
+    if: vars.PYPI_PUBLISH == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment: pypi

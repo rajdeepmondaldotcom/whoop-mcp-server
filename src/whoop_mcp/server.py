@@ -136,16 +136,26 @@ async def get_client() -> WhoopClient:
         async with _client_lock:
             if _state.client is None:
                 settings = get_settings()
-                manager = TokenManager(
-                    TokenStore(settings.tokens_path),
-                    lambda token: oauth.refresh_token(settings, token),
-                    static_access_token=settings.static_access_token,
-                )
-                _state.client = WhoopClient(
-                    manager,
-                    timeout=settings.request_timeout,
-                    cache_ttl=settings.cache_ttl,
-                )
+                if settings.demo_mode:
+                    from whoop_mcp.demo import DemoTokens, DemoWhoop
+
+                    logger.info("Demo mode: serving generated data, no WHOOP account used")
+                    _state.client = WhoopClient(
+                        DemoTokens(),
+                        transport=DemoWhoop().transport(),
+                        cache_ttl=settings.cache_ttl,
+                    )
+                else:
+                    manager = TokenManager(
+                        TokenStore(settings.tokens_path),
+                        lambda token: oauth.refresh_token(settings, token),
+                        static_access_token=settings.static_access_token,
+                    )
+                    _state.client = WhoopClient(
+                        manager,
+                        timeout=settings.request_timeout,
+                        cache_ttl=settings.cache_ttl,
+                    )
     return _state.client
 
 
@@ -721,6 +731,16 @@ async def get_connection_status() -> dict[str, Any]:
     token state and expiry, granted scopes, and a live API check. Call this
     first when WHOOP data tools fail."""
     settings = get_settings()
+    if settings.demo_mode:
+        return {
+            "connected": True,
+            "mode": "demo",
+            "note": (
+                "Demo mode is on (WHOOP_MCP_DEMO / --demo): all data is realistic but "
+                "generated. Run `whoop-mcp setup` and restart without --demo to "
+                "connect a real WHOOP account."
+            ),
+        }
     tokens = TokenStore(settings.tokens_path).load()
     configured = bool(settings.client_id and settings.client_secret)
     connected = bool(tokens) or bool(settings.static_access_token)
@@ -773,6 +793,16 @@ async def connect_whoop_account() -> dict[str, Any]:
     WHOOP app credentials to be configured already (otherwise it returns
     setup steps instead of opening anything)."""
     settings = get_settings()
+    if settings.demo_mode:
+        return {
+            "connected": True,
+            "mode": "demo",
+            "note": (
+                "Demo mode is on — there is nothing to authorize. To connect a real "
+                "WHOOP account, run `whoop-mcp setup` in a terminal and restart the "
+                "server without --demo."
+            ),
+        }
     if settings.static_access_token:
         return {"connected": True, "note": "Already using WHOOP_ACCESS_TOKEN from the environment."}
     if not (settings.client_id and settings.client_secret):

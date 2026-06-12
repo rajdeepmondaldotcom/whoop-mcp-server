@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.rajdeepmondaldotcom/whoop-mcp",
+  "description": "WHOOP recovery, sleep, strain & workouts for any AI — analysis tools, demo mode, one-command setup",
+  "repository": {
+    "url": "https://github.com/rajdeepmondaldotcom/whoop-mcp",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "whoop-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "WHOOP_MCP_DEMO",
+          "description": "Set to 1 to serve realistic generated data (no WHOOP account needed)",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

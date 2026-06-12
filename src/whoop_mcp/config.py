@@ -52,6 +52,8 @@ class Settings:
     log_level: str = "INFO"
     # Set via WHOOP_ACCESS_TOKEN to bypass OAuth entirely (no refresh; for testing).
     static_access_token: str | None = None
+    # WHOOP_MCP_DEMO=1 serves realistic generated data — no account needed.
+    demo_mode: bool = False
 
     @property
     def tokens_path(self) -> Path:
@@ -146,6 +148,7 @@ def load_settings(environ: dict[str, str] | None = None) -> Settings:
         request_timeout=as_float("WHOOP_MCP_TIMEOUT", 30.0),
         log_level=env.get("WHOOP_MCP_LOG_LEVEL", "INFO").upper(),
         static_access_token=env.get("WHOOP_ACCESS_TOKEN") or None,
+        demo_mode=env.get("WHOOP_MCP_DEMO", "").strip().lower() in ("1", "true", "yes", "on"),
     )
 
 

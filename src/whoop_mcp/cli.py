@@ -156,33 +156,37 @@ def cmd_setup(args: argparse.Namespace) -> int:
     binary = clients.find_binary()
     configured_any = False
 
-    if clients.claude_desktop_detected() and not args.skip_clients:
-        answer = input("  Claude Desktop detected. Add whoop-mcp to it now? [Y/n] ")
-        if answer.strip().lower() not in ("n", "no"):
-            path, action = clients.install_into_claude_desktop(binary)
+    if not args.skip_clients:
+        for spec in clients.detected_clients():
+            answer = input(f"  {spec.name} detected. Add whoop-mcp to it now? [Y/n] ")
+            if answer.strip().lower() in ("n", "no"):
+                continue
+            path, action = clients.install_into(spec, binary)
             configured_any = True
             if action == "unchanged":
-                print(f"  ✓ Already configured in {path}")
+                print(f"  ✓ {spec.name}: already configured ({path})")
             else:
-                print(f"  ✓ {action.capitalize()} in {path} (backup written)")
-                print("    → Fully quit and reopen Claude Desktop to load it.")
-    if clients.claude_code_detected() and not args.skip_clients:
-        command = clients.claude_code_command(binary)
-        answer = input("\n  Claude Code detected. Register whoop-mcp with it now? [Y/n] ")
-        if answer.strip().lower() not in ("n", "no"):
-            import subprocess
+                print(f"  ✓ {spec.name}: {action} in {path} (backup written)")
+                print(f"    → {spec.restart_hint}")
 
-            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
-            stderr = result.stderr.strip()
-            if result.returncode == 0:
-                configured_any = True
-                print("  ✓ Registered with Claude Code (user scope).")
-            elif "already exists" in stderr.lower():
-                configured_any = True
-                print("  ✓ Already registered with Claude Code.")
-            else:
-                print(f"  ✗ `{' '.join(command)}` failed: {stderr[:200]}")
-                print("    Run it manually if needed.")
+        if clients.claude_code_detected():
+            command = clients.claude_code_command(binary)
+            answer = input("\n  Claude Code detected. Register whoop-mcp with it now? [Y/n] ")
+            if answer.strip().lower() not in ("n", "no"):
+                import subprocess
+
+                result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+                stderr = result.stderr.strip()
+                if result.returncode == 0:
+                    configured_any = True
+                    print("  ✓ Registered with Claude Code (user scope).")
+                elif "already exists" in stderr.lower():
+                    configured_any = True
+                    print("  ✓ Already registered with Claude Code.")
+                else:
+                    print(f"  ✗ `{' '.join(command)}` failed: {stderr[:200]}")
+                    print("    Run it manually if needed.")
+
     if not configured_any:
         print("  Manual config (any MCP client):")
         print(f'    command: "{binary}"   args: ["serve"]')
@@ -249,10 +253,19 @@ def cmd_auth(args: argparse.Namespace) -> int:
 
 
 def cmd_serve(args: argparse.Namespace) -> int:
+    import os
+
+    if args.demo:
+        os.environ["WHOOP_MCP_DEMO"] = "1"
     settings = load_settings()
     _configure_logging(settings.log_level)
     transport = {"http": "streamable-http"}.get(args.transport, args.transport)
-    logger.info("Starting whoop-mcp %s (transport=%s)", __version__, transport)
+    logger.info(
+        "Starting whoop-mcp %s (transport=%s%s)",
+        __version__,
+        transport,
+        ", DEMO MODE" if settings.demo_mode or args.demo else "",
+    )
     from whoop_mcp.server import run
 
     run(transport=transport, host=args.host, port=args.port)
@@ -429,6 +442,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     serve.add_argument("--host", help="Bind host for HTTP transports (default 127.0.0.1)")
     serve.add_argument("--port", type=int, help="Bind port for HTTP transports (default 8000)")
+    serve.add_argument(
+        "--demo",
+        action="store_true",
+        help="Serve realistic generated data — try everything without a WHOOP account",
+    )
     serve.set_defaults(func=cmd_serve)
 
     status = sub.add_parser("status", help="Show configuration and token state")

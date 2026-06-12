@@ -1,178 +1,172 @@
+<!-- mcp-name: io.github.rajdeepmondaldotcom/whoop-mcp -->
+
+<div align="center">
+
 # whoop-mcp
 
-**Your WHOOP data, in any AI.** A Model Context Protocol (MCP) server that connects everything WHOOP knows about you — recovery, sleep, strain, workouts, heart rate, sleep-stage and overnight sensor data — to **Claude**, **ChatGPT**, and any other MCP client.
+**Ask your AI anything about your body.**
 
-Pure Python. Runs on your machine. Your health data and tokens never touch anyone else's server.
+The complete WHOOP → AI connector: recovery, sleep, strain, workouts, and overnight sensor data in Claude, ChatGPT, Cursor, and every MCP client — with the analysis layer that turns records into answers.
+
+[![CI](https://github.com/rajdeepmondaldotcom/whoop-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rajdeepmondaldotcom/whoop-mcp/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/rajdeepmondaldotcom/whoop-mcp)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![MCP](https://img.shields.io/badge/protocol-MCP-8A2BE2)](https://modelcontextprotocol.io)
+
+</div>
 
 ```text
-You: give me the full picture of my health this quarter
+You: should I train hard today?
 
-AI → get_health_overview(days=90)
-   ← Recovery 78% (green) today · recovery trending up, HRV improving
-   ← sleep avg 7.4h (stable) · training load balanced (A:C 1.02)
-   ← longest green streak: 11 days · strongest pattern: high-strain days
-     correlate with lower next-morning recovery (r=-0.61, strong)
+AI → get_daily_summary · get_strain_trends
+   ← Recovery 81% (green), HRV trending up, sleep debt cleared.
+   ← Acute:chronic load 0.94 — you're conditioned for more.
+   → "Yes — your body is primed. Last 3 times you trained hard on a
+      green day like this, recovery stayed green. Go."
 ```
 
-## Get started in 3 commands
+Your data never leaves your machine. Read-only. No telemetry. MIT.
+
+## Try it in 30 seconds — no WHOOP account needed
 
 ```bash
 git clone https://github.com/rajdeepmondaldotcom/whoop-mcp.git && cd whoop-mcp
-uv tool install .          # or: pipx install .
+uv tool install .            # or: pipx install .
+```
+
+<!-- TODO once on PyPI, this whole block becomes: uvx whoop-mcp setup -->
+
+Add to Claude Desktop (or any client) in **demo mode** and start asking:
+
+```bash
+claude mcp add whoop-demo -- whoop-mcp serve --demo
+```
+
+Demo mode serves 150 days of realistic generated data — periodized training, travel across timezones, the occasional terrible night — through the exact same pipeline as real data. Every tool works, the correlations are really there, and you can kick the tires before touching OAuth.
+
+## Connect your real WHOOP (3 minutes)
+
+```bash
 whoop-mcp setup
 ```
 
-That's it. `whoop-mcp setup` walks you through everything interactively:
+One guided command does everything:
 
-1. **WHOOP app** — guides you through creating your free developer app (one time, ~2 minutes; it opens the dashboard for you and tells you exactly what to click), then stores the credentials with `0600` permissions.
-2. **Authorize** — opens your browser to WHOOP's consent page; tokens are saved locally and auto-refresh forever after.
-3. **Verify** — makes a live API call and shows your actual latest recovery, so you know it works before you leave the terminal.
-4. **Connect your AI** — detects **Claude Desktop** and **Claude Code** and configures them *for you* (safely: existing config preserved, backup written). Prints copy-paste instructions for everything else.
+1. **WHOOP app** — walks you through creating your free developer app (opens the dashboard, tells you exactly what to click), stores credentials with `0600` perms.
+2. **Authorize** — opens WHOOP's consent page; tokens auto-refresh forever after.
+3. **Verify** — makes a live API call and shows your actual latest recovery before you leave the terminal.
+4. **Connect your AI** — detects **Claude Desktop, Cursor, Windsurf, VS Code, and Claude Code** and configures them *for you* (safely: config preserved, backup written, idempotent).
 
-Then ask your AI: *"How did I sleep last night?"*
-
-Already added the server to Claude but skipped auth? Just ask: *"connect my WHOOP account"* — the `connect_whoop_account` tool opens the consent page right from chat.
+Already added the server but skipped auth? Just tell your AI *"connect my WHOOP account"* — it opens the consent page from inside the chat.
 
 ## What your AI can do with it
 
-**23 tools.** Every read endpoint in WHOOP API v2 — plus the analysis layer that turns records into answers.
+**23 tools** covering every read endpoint in WHOOP API v2, plus the analysis most integrations make the model do badly by hand:
 
-### Holistic views
-| Tool | What it answers |
+| Ask… | Tool behind it |
 | --- | --- |
-| `get_health_overview` | **Start here.** Today's status + trend directions + training load + records + streaks + your strongest behavior↔physiology correlations, in one call |
-| `get_daily_summary` | "How am I doing today?" — recovery, sleep, strain, workouts for any day |
-| `get_weekly_report` | Monday–Sunday grid with averages and totals |
-| `get_correlations` | "What actually affects my recovery?" — strain → next-morning recovery, sleep duration/consistency → recovery, HRV → recovery, with Pearson r and plain-English readings |
-| `get_personal_records` | Bests, worsts, green-recovery streaks, totals over any window |
-| `compare_periods` | "This month vs last month" across every metric, polarity-aware |
+| "Give me the full picture of my health" | `get_health_overview` — status + trends + training load + records + correlations, one call |
+| "How am I doing today?" / "How did I sleep?" | `get_daily_summary` — recovery, sleep, strain, workouts for any day |
+| "What actually affects my recovery?" | `get_correlations` — lag-aware Pearson: strain → next-morning recovery, sleep duration/consistency → recovery, with plain-English readings |
+| "Am I overtraining?" | `get_strain_trends` — acute:chronic load ratio, per-sport breakdown |
+| "Is my HRV improving?" | `get_recovery_trends` — stats, direction, confidence, unusual days |
+| "Show my overnight heart-rate curve" | `get_sleep_stream` — minute-level HR + skin temp, lowest HR and when |
+| "This month vs last month?" | `compare_periods` — every metric, improved/declined/unchanged |
+| "My records this year?" | `get_personal_records` — bests, worsts, green streaks (real consecutive days) |
+| "Export everything" | `export_data` — complete history to local JSON + CSVs |
+| Week review, raw records, profile… | `get_weekly_report`, `get_sleeps/workouts/cycles/recoveries` (+ by-id with `include_raw`), `get_profile` |
+| Connection trouble? | `get_connection_status`, `connect_whoop_account` |
 
-### Trends & analysis
-| Tool | What it answers |
+Plus ChatGPT's required `search`/`fetch` contract, 4 resources, and 4 ready-made prompts (`morning_readiness`, `weekly_review`, `sleep_coach`, `training_planner`).
+
+Dates are plain English everywhere: `yesterday`, `last 30 days`, `this week`, `2 years ago`, `2026-05`…
+
+**Steal ideas:** [40+ prompts worth asking →](docs/PROMPTS.md)
+
+## Works with everything
+
+| Client | Setup |
 | --- | --- |
-| `get_recovery_trends` | Recovery %, HRV, resting HR: stats, direction, confidence, unusual days |
-| `get_sleep_trends` | Hours, performance, efficiency, consistency, sleep debt over time |
-| `get_strain_trends` | Daily strain, calories, per-sport breakdown, acute:chronic load ratio |
+| **Claude Desktop** | `whoop-mcp setup` configures it automatically |
+| **Claude Code** | `claude mcp add whoop -- whoop-mcp serve` (setup offers this too) |
+| **Cursor** | auto via setup — or [![Install in Cursor](https://img.shields.io/badge/Cursor-install-black)](cursor://anysphere.cursor-deeplink/mcp/install?name=whoop&config=eyJjb21tYW5kIjoid2hvb3AtbWNwIiwiYXJncyI6WyJzZXJ2ZSJdfQ==) |
+| **Windsurf** | auto via setup |
+| **VS Code** | auto via setup — or [![Install in VS Code](https://img.shields.io/badge/VS_Code-install-0078d4)](https://insiders.vscode.dev/redirect/mcp/install?name=whoop&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22whoop-mcp%22%2C%22args%22%3A%5B%22serve%22%5D%7D) |
+| **ChatGPT** | remote connector — see below |
+| **Anything MCP** | `command: whoop-mcp` `args: ["serve"]` · Inspector: `npx @modelcontextprotocol/inspector whoop-mcp serve` |
 
-### Records (every WHOOP v2 endpoint)
-| Tool | What it answers |
-| --- | --- |
-| `get_recoveries` / `get_sleeps` / `get_workouts` / `get_cycles` | Filterable lists (date expressions, sport filter, nap filter) |
-| `get_sleep` / `get_workout` / `get_cycle` | Single records — `get_cycle` joins its recovery + sleep; all take `include_raw` for the untouched API payload |
-| `get_sleep_stream` | **Minute-level overnight sensor data**: heart-rate and skin-temperature curves, lowest HR and when it happened |
-| `get_profile` | Name, email, height, weight, max HR |
+<details>
+<summary><b>ChatGPT setup</b></summary>
 
-### Data ownership & connection
-| Tool | What it answers |
-| --- | --- |
-| `export_data` | Writes your complete history to local files: `data.json` (everything, raw + transformed), `daily_summary.csv`, `workouts.csv` — "export my last 2 years" just works |
-| `get_connection_status` | Token state, scopes, live API check — first stop when something fails |
-| `connect_whoop_account` | Browser OAuth from inside the chat |
-
-Plus **4 resources** (`whoop://summary/today`, `whoop://recovery/latest`, `whoop://sleep/latest`, `whoop://profile`) and **4 prompts** (`morning_readiness`, `weekly_review`, `sleep_coach`, `training_planner`).
-
-Every date parameter takes plain English: `today`, `yesterday`, `7 days ago`, `last 30 days`, `this week`, `last month`, `3 months ago`, `2 years ago`, `2026-05`, `2026-05-12`, or full ISO timestamps.
-
-## Connecting each AI
-
-`whoop-mcp setup` handles Claude Desktop and Claude Code automatically. Manual equivalents:
-
-**Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) / `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
-
-```json
-{
-  "mcpServers": {
-    "whoop": { "command": "/absolute/path/to/whoop-mcp", "args": ["serve"] }
-  }
-}
-```
-
-**Claude Code**
-
-```bash
-claude mcp add --scope user whoop -- whoop-mcp serve
-```
-
-**ChatGPT** — ChatGPT connects to remote servers, so expose the HTTP transport:
+ChatGPT connects to remote MCP servers, so expose the HTTP transport and tunnel it:
 
 ```bash
 whoop-mcp serve --transport http --port 8000    # endpoint: /mcp
-ngrok http 8000                                  # or any tunnel / small VPS
+ngrok http 8000
 ```
 
-Then **Settings → Apps & Connectors → Advanced settings → Developer mode → create connector** with the tunnel URL + `/mcp`, no auth. The server implements the `search`/`fetch` contract, so it also works with plain connectors and Deep Research.
+Then **Settings → Apps & Connectors → Advanced settings → Developer mode → create connector** with `https://<your-tunnel>/mcp`, no auth. The `search`/`fetch` tools mean it also works with plain connectors and Deep Research.
 
-> ⚠️ A no-auth tunnel means anyone with the URL can read your health data. Keep the URL private and the tunnel short-lived. Claude's stdio setup never exposes anything.
+⚠️ A no-auth tunnel means anyone with the URL can read your health data. Keep it private and short-lived; Claude's stdio setup never exposes anything.
 
-**Anything else** — MCP Inspector: `npx @modelcontextprotocol/inspector whoop-mcp serve`
+</details>
 
-## Why this is the one to use
+## Why this one
 
-- **Exhaustive.** Every read endpoint in WHOOP API v2, including the relational cycle→recovery/sleep lookups and the granular sleep sensor stream most integrations don't know exist. `include_raw` and `export_data` guarantee you can always get the untouched payloads.
-- **Trend math that's actually right.** WHOOP returns records newest-first; naive integrations regress over arrival order and report every trend backwards. Series here are sorted by date, and directions respect polarity — rising HRV is *improving*, rising resting HR is *declining*.
-- **Timezone-correct days.** Records are bucketed onto calendar days using each record's own timezone offset. Your sleep belongs to the morning you woke up — even when you travel.
-- **OAuth that survives reality.** WHOOP rotates *both* tokens on every refresh. Refreshes here are lock-serialized and persisted before use; concurrent requests share one rotation; a re-auth rescues a live server without restart; a failed disk write doesn't lose the rotated pair.
-- **A polite API citizen.** Honors `X-RateLimit-Reset`, retries 5xx with jittered backoff, paginates with caps, caches briefly, and tells you when a result was truncated instead of pretending it's complete.
-- **Built for LLMs.** Milliseconds → `"7h 37m"`, kilojoules → calories, HR zones → minutes + percentages; structured content on every tool; analysis is computed server-side so the model never does arithmetic on 90 raw JSON records.
-- **Tested like it matters.** 91 tests including live in-process MCP sessions against a faked WHOOP API, token-rotation race tests, and timezone edge cases. CI on Python 3.10–3.13.
-
-**A note for WHOOP Peak members:** everything WHOOP's public API exposes is covered here. A few app-only features (stress monitor, healthspan/WHOOP Age) have no public API endpoints yet — the moment WHOOP ships them, they'll land here.
+- **It computes, the model narrates.** Trends, correlations, training load, and records are calculated server-side — sorted by date, polarity-aware (rising HRV = improving, rising resting HR = declining), timezone-correct (records bucket onto days using *their own* offset, so travel doesn't scramble your history). Models are bad at arithmetic over 90 JSON records; this never asks them to do any.
+- **Exhaustive.** Every v2 read endpoint including the relational cycle joins and the minute-level sleep sensor stream most integrations don't know exist. `include_raw` and `export_data` mean you can always get the untouched bytes. *(WHOOP Peak note: app-only features like stress monitor and healthspan have no public API yet — the moment WHOOP ships endpoints, they land here.)*
+- **OAuth that survives reality.** WHOOP rotates both tokens on every refresh; this server persists before use, lock-serializes refreshes, shares one rotation across concurrent requests, and picks up a re-auth without a restart.
+- **A polite API citizen.** Honors `X-RateLimit-Reset`, jittered retries, capped pagination, brief caching — and says so when a result is truncated rather than pretending it's complete.
+- **Tested like health data deserves.** 102 tests: live in-process MCP sessions over a faked WHOOP API, token-rotation races, timezone edges, and a demo-pipeline check that the analysis layer finds deliberately planted patterns. CI on Python 3.10–3.13.
 
 ## CLI
 
 ```text
-whoop-mcp setup     Guided setup: app → authorize → auto-configure clients (start here)
-whoop-mcp serve     Run the server (--transport stdio|http|sse, --host, --port)
-whoop-mcp auth      Just the OAuth flow (scriptable: --client-id/--client-secret/--no-browser)
-whoop-mcp status    Show config, token expiry, scopes
-whoop-mcp doctor    Diagnose python/sdk/credentials/connectivity, with fixes
-whoop-mcp logout    Delete local tokens (--revoke also revokes at WHOOP)
+whoop-mcp setup     Guided setup: app → authorize → auto-configure clients
+whoop-mcp serve     Run the server (--demo · --transport stdio|http|sse · --host/--port)
+whoop-mcp status    Config + token state        whoop-mcp doctor   Diagnose everything
+whoop-mcp auth      Scriptable OAuth flow       whoop-mcp logout   Delete tokens (--revoke)
 ```
 
 ## Configuration
 
-Zero configuration needed after `whoop-mcp setup`. Overrides, in priority order — process env, `./.env`, `~/.whoop-mcp/.env`, `~/.whoop-mcp/config.json`:
+Nothing required after `whoop-mcp setup`. Overrides (env > `./.env` > `~/.whoop-mcp/.env` > `~/.whoop-mcp/config.json`):
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `WHOOP_CLIENT_ID` / `WHOOP_CLIENT_SECRET` | — | WHOOP app credentials |
 | `WHOOP_REDIRECT_URI` | `http://localhost:8765/callback` | Must exactly match the dashboard |
-| `WHOOP_MCP_DIR` | `~/.whoop-mcp` | Tokens, config, and exports live here |
+| `WHOOP_MCP_DEMO` | — | `1` = demo mode (same as `--demo`) |
+| `WHOOP_MCP_DIR` | `~/.whoop-mcp` | Tokens, config, exports |
 | `WHOOP_MCP_TZ` | system zone | IANA timezone for "today", week bounds |
-| `WHOOP_MCP_CACHE_TTL` | `60` | Seconds to cache collection responses |
-| `WHOOP_MCP_TIMEOUT` | `30` | Per-request timeout (seconds) |
-| `WHOOP_MCP_LOG_LEVEL` | `INFO` | Logging (stderr only; stdout belongs to MCP) |
-| `WHOOP_ACCESS_TOKEN` | — | Static-token escape hatch (testing; no refresh) |
+| `WHOOP_MCP_CACHE_TTL` / `WHOOP_MCP_TIMEOUT` | `60` / `30` | Seconds |
+| `WHOOP_MCP_LOG_LEVEL` | `INFO` | stderr only — stdout belongs to MCP |
+| `WHOOP_ACCESS_TOKEN` | — | Static-token escape hatch (no refresh) |
 
 ## Privacy & security
 
-- All data tools are read-only and annotated as such; the only writes are local (`export_data` to your disk) and the OAuth flow you trigger.
-- Tokens and credentials live locally with `0600` permissions. No telemetry, no third-party services; the only network peer is `api.prod.whoop.com`.
-- Aggregates (trends, correlations, anomalies) can reveal more than single records. Connect this only to AI clients you trust with your health data.
+Read-only against WHOOP. Tokens local with `0600` perms. The only network peer is `api.prod.whoop.com`. No telemetry. Aggregates (trends, correlations) can reveal more than single records — connect this only to AI clients you trust with health data. Vulnerabilities: see [SECURITY.md](SECURITY.md).
 
-## Development
+## Contributing & development
 
 ```bash
-uv venv && uv pip install -e ".[dev]"
-pytest && ruff check .
+uv venv && uv pip install -e ".[dev]" && pytest && ruff check .
 ```
 
-`client.py` (httpx: auth, retries, rate limits, pagination, cache) → `transform.py` (raw → clean shapes) → `summaries.py` / `analytics.py` (day bucketing, trends, correlations, records) → `server.py` (FastMCP tools/resources/prompts). `oauth.py` + `tokens.py` own the auth lifecycle; `export.py` the bulk exporter; `clients.py` the Claude auto-config; `cli.py` the human surface.
+The whole test suite runs offline. See [CONTRIBUTING.md](CONTRIBUTING.md) for the invariants that keep the data honest. Architecture: `client.py` (httpx: auth/retries/rate-limits/pagination/cache) → `transform.py` (clean shapes) → `summaries.py`/`analytics.py` (bucketing, trends, correlations) → `server.py` (FastMCP). `oauth.py`+`tokens.py` own auth; `demo.py` the generated account; `export.py` bulk export; `clients.py` client auto-config; `cli.py` the human surface.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 | --- | --- |
 | "WHOOP authorization required" | `whoop-mcp setup` — or ask your AI to connect your WHOOP account |
-| Browser opens but redirect fails | Dashboard redirect URI must be exactly `http://localhost:8765/callback`; port 8765 free |
-| `403 forbidden — missing scope` | Enable all read scopes on the app, re-run `whoop-mcp auth` |
-| Tools missing in Claude Desktop | Re-run `whoop-mcp setup` (it fixes the config), then fully quit and reopen Claude |
-| Today shows no recovery | WHOOP scores recovery after you wake and sync; the summary says so |
-| Sleep stream "not available" | WHOOP doesn't expose the stream endpoint for every account/app — nightly summaries still work |
-| Anything else | `whoop-mcp doctor`, or `get_connection_status` from inside the chat |
+| Redirect fails after consent | Dashboard redirect URI must be exactly `http://localhost:8765/callback` |
+| `403 — missing scope` | Enable **all** read scopes + `offline` on the app, re-run `whoop-mcp auth` |
+| Tools missing in a client | Re-run `whoop-mcp setup`, then restart the client fully |
+| No recovery shown today | WHOOP scores it after you wake and sync; the summary says so |
+| Sleep stream "not available" | WHOOP doesn't expose it for every account/app — summaries still work |
+| Anything else | `whoop-mcp doctor` · `get_connection_status` from chat · [open an issue](https://github.com/rajdeepmondaldotcom/whoop-mcp/issues) |
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
-*Not affiliated with or endorsed by WHOOP. WHOOP is a trademark of WHOOP, Inc.*
+MIT — see [LICENSE](LICENSE). *Not affiliated with or endorsed by WHOOP. WHOOP is a trademark of WHOOP, Inc.*

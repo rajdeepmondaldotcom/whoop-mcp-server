@@ -61,3 +61,27 @@ def test_claude_code_command_shape():
     command = clients.claude_code_command("/bin/whoop-mcp")
     assert command[:4] == ["claude", "mcp", "add", "--scope"]
     assert command[-3:] == ["--", "/bin/whoop-mcp", "serve"]
+
+
+def test_vscode_layout_uses_servers_and_type(tmp_path):
+    spec = clients.ClientSpec(
+        key="vscode",
+        name="VS Code",
+        config_path=lambda: tmp_path / "User" / "mcp.json",
+        container_key="servers",
+        entry_style="typed",
+        restart_hint="",
+    )
+    path, action = clients.install_into(spec, "/bin/whoop-mcp")
+    assert action == "added"
+    config = json.loads(path.read_text())
+    assert config["servers"]["whoop"] == {
+        "type": "stdio",
+        "command": "/bin/whoop-mcp",
+        "args": ["serve"],
+    }
+
+
+def test_all_client_specs_have_distinct_paths():
+    paths = {spec.config_path() for spec in clients.CLIENT_SPECS}
+    assert len(paths) == len(clients.CLIENT_SPECS)

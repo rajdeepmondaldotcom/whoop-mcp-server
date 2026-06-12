@@ -5,7 +5,7 @@ Values are resolved in priority order:
 1. Process environment variables (``WHOOP_*``)
 2. A ``.env`` file in the current working directory
 3. A ``.env`` file in the data directory (``~/.whoop-mcp`` by default)
-4. ``config.json`` in the data directory (written by ``whoop-mcp auth --save``)
+4. ``config.json`` in the data directory (written by ``whoop-mcp-server auth --save``)
 """
 
 from __future__ import annotations
@@ -76,7 +76,7 @@ class Settings:
             raise ConfigError(
                 f"Missing {' and '.join(missing)}. Create an app at "
                 "https://developer-dashboard.whoop.com, then either export the "
-                "environment variables or run `whoop-mcp auth` once with "
+                "environment variables or run `whoop-mcp-server auth` once with "
                 "--client-id/--client-secret to store them."
             )
 

@@ -1,4 +1,4 @@
-<!-- mcp-name: io.github.rajdeepmondaldotcom/whoop-mcp -->
+<!-- mcp-name: io.github.rajdeepmondaldotcom/whoop-mcp-server -->
 
 # whoop-mcp-server
 
@@ -36,8 +36,8 @@ Ask "how did I sleep last week?" and watch. The patterns in the demo data are re
 Two commands. About 3 minutes, most of it WHOOP's consent screen.
 
 ```bash
-uv tool install whoop-mcp-server    # puts the whoop-mcp command on your PATH
-whoop-mcp setup
+uv tool install whoop-mcp-server    # puts the whoop-mcp-server command on your PATH
+whoop-mcp-server setup
 ```
 
 (No `uv`? `pipx install whoop-mcp-server` works too.)
@@ -74,13 +74,13 @@ More questions worth asking: [docs/PROMPTS.md](docs/PROMPTS.md).
 
 | Client | Setup |
 | --- | --- |
-| Claude Desktop | `whoop-mcp setup` configures it for you |
-| Claude Code | `claude mcp add whoop -- whoop-mcp serve` (setup offers this too) |
-| Cursor | auto via setup, or [![Install in Cursor](https://img.shields.io/badge/Cursor-install-black)](https://cursor.com/install-mcp?name=whoop&config=eyJjb21tYW5kIjoid2hvb3AtbWNwIiwiYXJncyI6WyJzZXJ2ZSJdfQ%3D%3D) |
+| Claude Desktop | `whoop-mcp-server setup` configures it for you |
+| Claude Code | `claude mcp add whoop -- whoop-mcp-server serve` (setup offers this too) |
+| Cursor | auto via setup, or [![Install in Cursor](https://img.shields.io/badge/Cursor-install-black)](https://cursor.com/install-mcp?name=whoop&config=eyJjb21tYW5kIjoid2hvb3AtbWNwLXNlcnZlciIsImFyZ3MiOlsic2VydmUiXX0%3D) |
 | Windsurf | auto via setup |
-| VS Code | auto via setup, or [![Install in VS Code](https://img.shields.io/badge/VS_Code-install-0078d4)](https://insiders.vscode.dev/redirect/mcp/install?name=whoop&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22whoop-mcp%22%2C%22args%22%3A%5B%22serve%22%5D%7D) |
+| VS Code | auto via setup, or [![Install in VS Code](https://img.shields.io/badge/VS_Code-install-0078d4)](https://insiders.vscode.dev/redirect/mcp/install?name=whoop&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22whoop-mcp-server%22%2C%22args%22%3A%5B%22serve%22%5D%7D) |
 | ChatGPT | remote connector, see below |
-| Any MCP client | `command: whoop-mcp` with `args: ["serve"]`. Inspector: `npx @modelcontextprotocol/inspector whoop-mcp serve` |
+| Any MCP client | `command: whoop-mcp-server` with `args: ["serve"]`. Inspector: `npx @modelcontextprotocol/inspector whoop-mcp-server serve` |
 
 <details>
 <summary><b>ChatGPT setup</b></summary>
@@ -88,7 +88,7 @@ More questions worth asking: [docs/PROMPTS.md](docs/PROMPTS.md).
 ChatGPT connects to remote MCP servers, so expose the HTTP transport and tunnel it:
 
 ```bash
-whoop-mcp serve --transport http --port 8000    # endpoint: /mcp
+whoop-mcp-server serve --transport http --port 8000    # endpoint: /mcp
 ngrok http 8000
 ```
 
@@ -115,17 +115,17 @@ What it can't do: WHOOP's public API has no endpoints yet for Peak features like
 ## CLI
 
 ```text
-whoop-mcp setup     Guided setup: app, authorize, auto-configure clients
-whoop-mcp serve     Run the server (--demo, --transport stdio|http|sse, --host, --port)
-whoop-mcp status    Config and token state
-whoop-mcp doctor    Diagnose setup and connectivity
-whoop-mcp auth      Scriptable OAuth flow
-whoop-mcp logout    Delete tokens (--revoke also revokes at WHOOP)
+whoop-mcp-server setup     Guided setup: app, authorize, auto-configure clients
+whoop-mcp-server serve     Run the server (--demo, --transport stdio|http|sse, --host, --port)
+whoop-mcp-server status    Config and token state
+whoop-mcp-server doctor    Diagnose setup and connectivity
+whoop-mcp-server auth      Scriptable OAuth flow
+whoop-mcp-server logout    Delete tokens (--revoke also revokes at WHOOP)
 ```
 
 ## Configuration
 
-Nothing required after `whoop-mcp setup`. Overrides, in priority order: process env, `./.env`, `~/.whoop-mcp/.env`, `~/.whoop-mcp/config.json`.
+Nothing required after `whoop-mcp-server setup`. Overrides, in priority order: process env, `./.env`, `~/.whoop-mcp/.env`, `~/.whoop-mcp/config.json`.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -156,13 +156,13 @@ The whole test suite runs offline. [CONTRIBUTING.md](CONTRIBUTING.md) lists the 
 
 | Symptom | Fix |
 | --- | --- |
-| "WHOOP authorization required" | `whoop-mcp setup`, or ask your AI to connect your WHOOP account |
+| "WHOOP authorization required" | `whoop-mcp-server setup`, or ask your AI to connect your WHOOP account |
 | Redirect fails after consent | The dashboard redirect URI must be exactly `http://localhost:8765/callback` |
-| `403 missing scope` | Enable all read scopes plus `offline` on the app, then re-run `whoop-mcp auth` |
-| Tools missing in a client | Re-run `whoop-mcp setup`, then fully restart the client |
+| `403 missing scope` | Enable all read scopes plus `offline` on the app, then re-run `whoop-mcp-server auth` |
+| Tools missing in a client | Re-run `whoop-mcp-server setup`, then fully restart the client |
 | No recovery shown today | WHOOP scores it after you wake and sync. The summary says so |
 | Sleep stream "not available" | WHOOP doesn't expose it for every account. Nightly summaries still work |
-| Anything else | `whoop-mcp doctor`, or `get_connection_status` from chat, or [open an issue](https://github.com/rajdeepmondaldotcom/whoop-mcp-server/issues) |
+| Anything else | `whoop-mcp-server doctor`, or `get_connection_status` from chat, or [open an issue](https://github.com/rajdeepmondaldotcom/whoop-mcp-server/issues) |
 
 ## License
 

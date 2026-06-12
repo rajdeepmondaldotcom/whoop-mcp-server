@@ -9,7 +9,7 @@ from __future__ import annotations
 
 
 class WhoopError(Exception):
-    """Base class for all whoop-mcp errors."""
+    """Base class for all whoop-mcp-server errors."""
 
 
 class ConfigError(WhoopError):
@@ -25,7 +25,7 @@ class AuthRequiredError(WhoopError):
 
     def __init__(self, detail: str = "") -> None:
         message = (
-            "WHOOP authorization required. Run `whoop-mcp auth` in a terminal to "
+            "WHOOP authorization required. Run `whoop-mcp-server auth` in a terminal to "
             "connect your WHOOP account, then try again."
         )
         if detail:

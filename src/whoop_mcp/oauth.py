@@ -1,6 +1,6 @@
 """WHOOP OAuth 2.0 authorization-code flow.
 
-The interactive flow (``whoop-mcp auth``) spins up a tiny localhost HTTP
+The interactive flow (``whoop-mcp-server auth``) spins up a tiny localhost HTTP
 server matching the registered redirect URI, opens the system browser to
 WHOOP's consent page, captures the authorization code, validates the CSRF
 ``state``, and exchanges the code for tokens. Token refresh lives here too
@@ -41,7 +41,7 @@ _ERROR_PAGE = """<!doctype html>
 <body style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 4rem auto;">
 <h1>&#10060; Authorization failed</h1>
 <p>{detail}</p>
-<p>Close this tab and re-run <code>whoop-mcp auth</code>.</p>
+<p>Close this tab and re-run <code>whoop-mcp-server auth</code>.</p>
 </body></html>"""
 
 

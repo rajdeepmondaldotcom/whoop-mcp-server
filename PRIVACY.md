@@ -34,7 +34,7 @@ one. Connect only AI clients you trust with health data.
 
 ## Revoking access
 
-Run `whoop-mcp logout --revoke` to revoke the app's access with WHOOP and
+Run `whoop-mcp-server logout --revoke` to revoke the app's access with WHOOP and
 delete the local tokens. You can also revoke access any time from your
 WHOOP account settings.
 

@@ -117,13 +117,14 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
     if not sys.stdin.isatty():
         print(
-            "error: `whoop-mcp setup` is interactive - run it in a terminal.\n"
-            "(For scripted setups use `whoop-mcp auth --client-id ... --client-secret ...`.)",
+            "error: `whoop-mcp-server setup` is interactive - run it in a terminal.\n"
+            "(For scripted setups use `whoop-mcp-server auth` with --client-id and "
+            "--client-secret.)",
             file=sys.stderr,
         )
         return 1
 
-    print("\n┌─ whoop-mcp setup ─────────────────────────────────────────────┐")
+    print("\n┌─ whoop-mcp-server setup ─────────────────────────────────────────────┐")
     print("│ Connects your WHOOP account and configures your AI clients.   │")
     print("└────────────────────────────────────────────────────────────────┘\n")
 
@@ -219,7 +220,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
             if spec.key == "claude-desktop" and _claude_desktop_running():
                 print("  Skipping Claude Desktop (still running).")
                 continue
-            answer = input(f"  {spec.name} detected. Add whoop-mcp to it now? [Y/n] ")
+            answer = input(f"  {spec.name} detected. Add whoop-mcp-server to it now? [Y/n] ")
             if answer.strip().lower() in ("n", "no"):
                 continue
             path, action = clients.install_into(spec, binary)
@@ -235,11 +236,11 @@ def cmd_setup(args: argparse.Namespace) -> int:
             if _verify_stdio_boot(binary):
                 print("  ✓ Verified: the server answers over stdio.")
             else:
-                print("  ✗ The configured command failed to start. Run `whoop-mcp doctor`.")
+                print("  ✗ The configured command failed to start. Run `whoop-mcp-server doctor`.")
 
         if clients.claude_code_detected():
             command = clients.claude_code_command(binary)
-            answer = input("\n  Claude Code detected. Register whoop-mcp with it now? [Y/n] ")
+            answer = input("\n  Claude Code detected. Register the server with it now? [Y/n] ")
             if answer.strip().lower() not in ("n", "no"):
                 import subprocess
 
@@ -353,7 +354,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     if settings.static_access_token:
         print("  tokens:        using WHOOP_ACCESS_TOKEN from environment")
     elif tokens is None:
-        print("  tokens:        none - run `whoop-mcp auth`")
+        print("  tokens:        none - run `whoop-mcp-server auth`")
     else:
         remaining = tokens.expires_at - time.time()
         when = datetime.fromtimestamp(tokens.expires_at, tz=timezone.utc).isoformat(
@@ -380,7 +381,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             problems += 1
         print(f"  [{mark}] {label}" + (f" - {detail}" if detail else ""))
 
-    print("whoop-mcp doctor\n")
+    print("whoop-mcp-server doctor\n")
     check("python >= 3.10", sys.version_info >= (3, 10), sys.version.split()[0])
     try:
         from importlib.metadata import version as pkg_version
@@ -397,7 +398,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     check(
         "whoop account connected",
         has_auth,
-        "" if has_auth else "run `whoop-mcp auth`",
+        "" if has_auth else "run `whoop-mcp-server auth`",
     )
 
     if has_auth and (has_creds or settings.static_access_token):
@@ -471,7 +472,7 @@ def cmd_logout(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="whoop-mcp",
+        prog="whoop-mcp-server",
         description="MCP server for WHOOP recovery, sleep, strain, and workout data.",
     )
     parser.add_argument("--version", action="version", version=f"whoop-mcp {__version__}")
@@ -539,7 +540,7 @@ def main(argv: list[str] | None = None) -> None:
         if sys.stdin.isatty():
             # A human at a terminal almost never wants a silent stdio server.
             parser.print_help()
-            print("\nFirst time here? Run:  whoop-mcp setup")
+            print("\nFirst time here? Run:  whoop-mcp-server setup")
             sys.exit(0)
         # Spawned by an MCP client (stdin is a pipe): serve stdio so a bare
         # `whoop-mcp` works in client configs.

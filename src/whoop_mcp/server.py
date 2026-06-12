@@ -98,7 +98,7 @@ Usage:
 - Date parameters accept: {DATE_FORMS}.
 
 If a tool reports that authorization is required: the user can either run
-`whoop-mcp setup` in a terminal, or - if they explicitly ask you to connect -
+`whoop-mcp-server setup` in a terminal, or - if they explicitly ask you to connect -
 call the connect_whoop_account tool, which opens their browser for WHOOP consent.
 Check get_connection_status when unsure."""
 
@@ -737,7 +737,7 @@ async def get_connection_status() -> dict[str, Any]:
             "mode": "demo",
             "note": (
                 "Demo mode is on (WHOOP_MCP_DEMO / --demo): all data is realistic but "
-                "generated. Run `whoop-mcp setup` and restart without --demo to "
+                "generated. Run `whoop-mcp-server setup` and restart without --demo to "
                 "connect a real WHOOP account."
             ),
         }
@@ -773,7 +773,7 @@ async def get_connection_status() -> dict[str, Any]:
             out["api_error"] = str(exc)
     else:
         out["how_to_connect"] = (
-            "Run `whoop-mcp setup` in a terminal for the guided flow, or ask me to "
+            "Run `whoop-mcp-server setup` in a terminal for the guided flow, or ask me to "
             "connect your WHOOP account (I'll open the consent page in your browser)."
         )
     return out
@@ -799,7 +799,7 @@ async def connect_whoop_account() -> dict[str, Any]:
             "mode": "demo",
             "note": (
                 "Demo mode is on - there is nothing to authorize. To connect a real "
-                "WHOOP account, run `whoop-mcp setup` in a terminal and restart the "
+                "WHOOP account, run `whoop-mcp-server setup` in a terminal and restart the "
                 "server without --demo."
             ),
         }
@@ -814,7 +814,7 @@ async def connect_whoop_account() -> dict[str, Any]:
                 "2. Enable every scope (read:recovery, read:cycles, read:sleep, read:workout, "
                 "read:profile, read:body_measurement, offline) and register the redirect URI "
                 f"{settings.redirect_uri}",
-                "3. Run `whoop-mcp setup` in a terminal and paste the Client ID/Secret - then "
+                "3. Run `whoop-mcp-server setup` in a terminal, paste the Client ID/Secret, "
                 "ask me to connect again.",
             ],
         }

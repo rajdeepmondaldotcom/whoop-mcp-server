@@ -1,6 +1,6 @@
 """Auto-configuration of MCP clients.
 
-Used by ``whoop-mcp setup`` so a user never has to hand-edit JSON. One spec
+Used by ``whoop-mcp-server setup`` so a user never has to hand-edit JSON. One spec
 per client; all JSON-file clients share a writer that is deliberately
 conservative: existing config parsed leniently, a ``.bak`` written before
 the first change (never overwritten with corrupt bytes), edits atomic.
@@ -33,19 +33,21 @@ def find_binary() -> str:
     resolved path into client configs breaks every config on the next
     reinstall.
     """
-    on_path = shutil.which("whoop-mcp")
-    if on_path:
-        return str(Path(on_path).absolute())
-    launcher = Path.home() / ".local" / "bin" / "whoop-mcp"
-    if launcher.exists():
-        return str(launcher)
+    for name in ("whoop-mcp-server", "whoop-mcp"):
+        on_path = shutil.which(name)
+        if on_path:
+            return str(Path(on_path).absolute())
+        launcher = Path.home() / ".local" / "bin" / name
+        if launcher.exists():
+            return str(launcher)
     candidate = Path(sys.argv[0]).absolute()
     if candidate.name in ("whoop-mcp", "whoop-mcp-server") and candidate.exists():
         return str(candidate)
-    sibling = Path(sys.executable).parent / "whoop-mcp"
-    if sibling.exists():
-        return str(sibling.absolute())
-    return "whoop-mcp"  # hope it's on the client's PATH
+    for name in ("whoop-mcp-server", "whoop-mcp"):
+        sibling = Path(sys.executable).parent / name
+        if sibling.exists():
+            return str(sibling.absolute())
+    return "whoop-mcp-server"  # hope it's on the client's PATH
 
 
 # ------------------------------------------------------------ config paths

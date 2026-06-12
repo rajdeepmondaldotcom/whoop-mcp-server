@@ -175,7 +175,7 @@ class WhoopClient:
             400: "bad request",
             403: (
                 "forbidden - your WHOOP app is missing a scope for this data, or the "
-                "WHOOP membership is inactive. Re-run `whoop-mcp auth` after enabling "
+                "WHOOP membership is inactive. Re-run `whoop-mcp-server auth` after enabling "
                 "all read scopes in the developer dashboard"
             ),
             404: "not found - check the id",

@@ -1,6 +1,6 @@
 """Demo mode: a realistic, fully offline WHOOP account.
 
-``whoop-mcp serve --demo`` (or ``WHOOP_MCP_DEMO=1``) serves 150 days of
+``whoop-mcp-server serve --demo`` (or ``WHOOP_MCP_DEMO=1``) serves 150 days of
 generated data through the exact same client/transform/analytics pipeline as
 real data - no WHOOP account, no developer app, no OAuth. It exists so
 anyone can try the server in 30 seconds before committing to setup.

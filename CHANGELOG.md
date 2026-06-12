@@ -21,13 +21,13 @@ First release.
 - All day bucketing uses each record's own timezone offset
 
 ### Experience
-- `whoop-mcp setup`: guided WHOOP app creation, browser OAuth, live
+- `whoop-mcp-server setup`: guided WHOOP app creation, browser OAuth, live
   verification, automatic configuration of Claude Desktop, Cursor, Windsurf,
   VS Code, and Claude Code
 - Demo mode (`--demo`): 150 days of realistic generated data, no account
   needed
 - In-chat authorization (`connect_whoop_account`) and diagnostics
-  (`get_connection_status`, `whoop-mcp doctor`)
+  (`get_connection_status`, `whoop-mcp-server doctor`)
 - ChatGPT connector compatibility (`search` and `fetch`), stdio and HTTP
   transports
 

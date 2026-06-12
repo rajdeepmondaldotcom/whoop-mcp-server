@@ -40,7 +40,7 @@ def test_store_tolerates_corrupt_file(tmp_path):
 
 async def test_missing_tokens_raise_auth_required(tmp_path):
     manager = TokenManager(TokenStore(tmp_path / "tokens.json"), refresher=_fail_refresher)
-    with pytest.raises(AuthRequiredError, match="whoop-mcp auth"):
+    with pytest.raises(AuthRequiredError, match="whoop-mcp-server auth"):
         await manager.get_access_token()
 
 
@@ -102,7 +102,7 @@ async def test_concurrent_calls_refresh_once(tmp_path):
 
 
 async def test_reauth_on_disk_rescues_running_manager(tmp_path):
-    """A fresh `whoop-mcp auth` must be picked up without restarting the server."""
+    """A fresh `whoop-mcp-server auth` must be picked up without restarting the server."""
     store = TokenStore(tmp_path / "tokens.json")
     store.save(fresh(expires_in=0))
     calls = 0

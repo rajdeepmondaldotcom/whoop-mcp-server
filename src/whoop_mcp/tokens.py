@@ -127,7 +127,7 @@ class TokenManager:
         """Freshest of the in-memory set and tokens.json.
 
         Reading the file every time keeps a long-lived server in sync with
-        the outside world: a `whoop-mcp auth` re-run (or another process
+        the outside world: a `whoop-mcp-server auth` re-run (or another process
         rotating the pair) is picked up without a restart.
         """
         candidates = [t for t in (self._current, self._store.load()) if t is not None]
@@ -170,7 +170,7 @@ class TokenManager:
                     refreshed = await self._refresher(tokens.refresh_token)
                 except Exception:
                     # Drop the in-memory copy so the next attempt re-reads
-                    # tokens.json - a fresh `whoop-mcp auth` can then rescue a
+                    # tokens.json - a fresh `whoop-mcp-server auth` can then rescue a
                     # running server without a restart.
                     self._current = None
                     raise

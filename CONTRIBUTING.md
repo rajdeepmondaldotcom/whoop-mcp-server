@@ -11,7 +11,7 @@ uv venv && uv pip install -e ".[dev]"
 .venv/bin/ruff check .
 ```
 
-You don't need a WHOOP account to develop. The test suite fakes the API at the HTTP layer, and `whoop-mcp serve --demo` gives you a live server with generated data.
+You don't need a WHOOP account to develop. The test suite fakes the API at the HTTP layer, and `whoop-mcp-server serve --demo` gives you a live server with generated data.
 
 ## Invariants
 

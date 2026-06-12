@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.rajdeepmondaldotcom/whoop-mcp",
+  "name": "io.github.rajdeepmondaldotcom/whoop-mcp-server",
   "description": "WHOOP recovery, sleep, strain, and workouts for any AI. Analysis tools, demo mode, fast setup.",
   "repository": {
     "url": "https://github.com/rajdeepmondaldotcom/whoop-mcp-server",

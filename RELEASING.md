@@ -19,8 +19,8 @@ The version lives in `pyproject.toml` (mirrored in
 ## PyPI
 
 The package publishes as `whoop-mcp-server` (the name `whoop-mcp` was
-already taken on PyPI). The CLI command stays `whoop-mcp`, with a
-`whoop-mcp-server` alias so `uvx whoop-mcp-server` works.
+already taken on PyPI). The command is `whoop-mcp-server`, with a shorter
+`whoop-mcp` alias kept for existing client configs.
 
 The `PYPI_API_TOKEN` repo secret powers the publish step. Once the project
 exists on PyPI, you can swap the account-scoped token for one scoped to

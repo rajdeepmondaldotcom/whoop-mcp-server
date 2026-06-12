@@ -1,5 +1,13 @@
 name: Release
 
+# Pushing to main fans out a full release automatically:
+#   - bump + tag the version; create a GitHub release with the wheel/sdist and the .mcpb bundle
+#   - publish to PyPI (whoop-mcp-server)
+#   - publish to the official MCP Registry (io.github.rajdeepmondaldotcom/whoop-mcp-server)
+#   - build and push a container image to ghcr.io
+# Directories that ingest the MCP Registry (PulseMCP, Glama, mcpservers.org, and
+# others) pick up each new version on their own, so they need no per-release step.
+
 on:
   push:
     branches: [main]
@@ -117,3 +125,33 @@ jobs:
           tar xzf mcp-publisher.tar.gz mcp-publisher
           ./mcp-publisher login github-oidc
           ./mcp-publisher publish
+
+  docker:
+    # Build and push a container image to GitHub Container Registry on each
+    # release. Uses the built-in GITHUB_TOKEN, so no secret is required.
+    # One-time: make the ghcr.io/<owner>/whoop-mcp-server package public in its
+    # GitHub package settings to allow anonymous `docker pull`.
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ needs.release.outputs.version }}
+            ghcr.io/${{ github.repository }}:latest

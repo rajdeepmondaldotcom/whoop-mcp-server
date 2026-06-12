@@ -150,7 +150,9 @@ def _make_handler(result: _CallbackResult, expected_path: str):
             self.wfile.write(payload)
 
         def log_message(self, format: str, *args) -> None:  # noqa: A002
-            logger.debug("callback server: " + format, *args)
+            # The request line carries the one-time authorization code in its
+            # query string — log only the path, never the args.
+            logger.debug("callback server: handled %s", self.path.partition("?")[0])
 
     return CallbackHandler
 

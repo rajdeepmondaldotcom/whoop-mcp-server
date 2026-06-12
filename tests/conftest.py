@@ -364,8 +364,10 @@ class StaticTokens:
         self.token = token
         self.refreshes = 0
 
-    async def get_access_token(self, *, force_refresh: bool = False) -> str:
-        if force_refresh:
+    async def get_access_token(
+        self, *, force_refresh: bool = False, rejected: str | None = None
+    ) -> str:
+        if force_refresh and (rejected is None or rejected == self.token):
             self.refreshes += 1
             self.token = "test-token"
         return self.token

@@ -121,30 +121,69 @@ class TokenManager:
 
     @property
     def current(self) -> TokenSet | None:
-        return self._current or self._store.load()
+        return self._freshest()
 
-    async def get_access_token(self, *, force_refresh: bool = False) -> str:
+    def _freshest(self) -> TokenSet | None:
+        """Freshest of the in-memory set and tokens.json.
+
+        Reading the file every time keeps a long-lived server in sync with
+        the outside world: a `whoop-mcp auth` re-run (or another process
+        rotating the pair) is picked up without a restart.
+        """
+        candidates = [t for t in (self._current, self._store.load()) if t is not None]
+        if not candidates:
+            return None
+        return max(candidates, key=lambda t: t.expires_at)
+
+    async def get_access_token(
+        self, *, force_refresh: bool = False, rejected: str | None = None
+    ) -> str:
+        """Return a valid access token.
+
+        ``rejected`` is the token a request just got a 401 with. If the
+        current token already differs, a concurrent caller refreshed in the
+        meantime and we hand that out instead of rotating again — WHOOP
+        invalidates the old pair on every refresh, so redundant rotations
+        would knock out sibling requests' retries.
+        """
         if self._static:
             return self._static
 
         async with self._lock:
-            tokens = self._current or self._store.load()
+            tokens = self._freshest()
             if tokens is None:
                 raise AuthRequiredError("no stored tokens")
+
+            if force_refresh and rejected is not None and tokens.access_token != rejected:
+                force_refresh = False
 
             needs_refresh = force_refresh or tokens.expires_within(EXPIRY_BUFFER_SECONDS)
             if needs_refresh:
                 if not tokens.refresh_token:
+                    self._current = None
                     raise AuthRequiredError(
                         "access token expired and no refresh token is available — "
                         "make sure the `offline` scope is enabled"
                     )
                 logger.info("Refreshing WHOOP access token")
-                refreshed = await self._refresher(tokens.refresh_token)
+                try:
+                    refreshed = await self._refresher(tokens.refresh_token)
+                except Exception:
+                    # Drop the in-memory copy so the next attempt re-reads
+                    # tokens.json — a fresh `whoop-mcp auth` can then rescue a
+                    # running server without a restart.
+                    self._current = None
+                    raise
                 if refreshed.refresh_token is None:
                     # Server kept the old refresh token (allowed by RFC 6749 §6).
                     refreshed.refresh_token = tokens.refresh_token
-                self._store.save(refreshed)
+                self._current = refreshed
+                try:
+                    self._store.save(refreshed)
+                except OSError as exc:
+                    # Keep serving from memory; losing the rotated pair would
+                    # be worse than a stale file.
+                    logger.error("Could not persist WHOOP tokens to %s: %s", self._store.path, exc)
                 tokens = refreshed
 
             self._current = tokens

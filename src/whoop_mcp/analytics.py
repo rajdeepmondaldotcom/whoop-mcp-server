@@ -104,7 +104,11 @@ def describe_series(metric: str, series: list[DayValue]) -> dict[str, Any] | Non
 def _direction(metric: str, slope: float, span_days: int, mean: float) -> str:
     polarity = METRIC_POLARITY.get(metric, 0)
     change = slope * span_days
-    relative = abs(change) / abs(mean) if mean else 0.0
+    if mean:
+        relative = abs(change) / abs(mean)
+    else:
+        # Series averaging ~0 (e.g. sleep debt): any real slope is a trend.
+        relative = float("inf") if change else 0.0
     if relative < STABLE_THRESHOLD:
         return "stable"
     rising = slope > 0
@@ -187,7 +191,7 @@ def compare_metric(
     change = value_b - value_a
     pct = (change / abs(value_a) * 100) if value_a else None
     polarity = METRIC_POLARITY.get(metric, 0)
-    if pct is not None and abs(pct) <= deadband * 100:
+    if change == 0 or (pct is not None and abs(pct) <= deadband * 100):
         assessment = "unchanged"
     elif polarity == 0:
         assessment = "increased" if change > 0 else "decreased"

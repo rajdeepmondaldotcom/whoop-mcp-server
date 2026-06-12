@@ -114,21 +114,32 @@ def parse_point(
         return _day_point(last if end else first, tz, end)
 
     if match := _MONTH.match(text):
-        first, last = _month_bounds(date(int(match.group(1)), int(match.group(2)), 1))
+        try:
+            anchor = date(int(match.group(1)), int(match.group(2)), 1)
+        except ValueError:
+            raise WhoopError(
+                f"Invalid month {expr!r}: the month must be 01-12."
+            ) from None
+        first, last = _month_bounds(anchor)
         return _day_point(last if end else first, tz, end)
 
-    # ISO date or datetime (datetime.fromisoformat handles offsets; map 'Z' too).
+    raw = expr.strip()
+    # Date-only ISO forms get day granularity (so end=True means end of day).
+    if len(raw) <= 10:
+        try:
+            return _day_point(date.fromisoformat(raw), tz, end)
+        except ValueError:
+            pass
+
+    # Full ISO datetimes (fromisoformat handles offsets; map 'Z' too).
     try:
-        parsed = datetime.fromisoformat(expr.strip().replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
     except ValueError:
         raise WhoopError(
             f"Could not parse date expression {expr!r}. Supported forms: {SUPPORTED_FORMS}"
         ) from None
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=tz)
-    is_bare_date = len(expr.strip()) == 10
-    if is_bare_date:
-        return _day_point(parsed.date(), tz, end)
     return parsed
 
 

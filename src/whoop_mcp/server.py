@@ -326,12 +326,19 @@ async def get_sleeps(
     """
     start_dt, end_dt = _parse_window(start, end, default_days=14)
     client = await get_client()
-    fetch_max = _clamp_limit(limit if include_naps else limit * 2)
+    limit = _clamp_limit(limit)
+    fetch_max = _clamp_limit(limit if include_naps else limit * 3)
     records, truncated = await client.sleeps(start_dt, end_dt, fetch_max)
+    note = None
     if not include_naps:
         records = [r for r in records if not r.get("nap")]
-    records = records[: _clamp_limit(limit)]
-    return _collection_result([transform_sleep(r) for r in records], truncated)
+        if truncated and len(records) < limit:
+            note = (
+                "The nap filter scanned only the newest records and may have missed "
+                "older main sleeps — narrow the date range for complete results."
+            )
+    records = records[:limit]
+    return _collection_result([transform_sleep(r) for r in records], truncated, note)
 
 
 @mcp.tool(
@@ -371,6 +378,11 @@ async def get_workouts(
         needle = sport.strip().lower()
         records = [r for r in records if needle in str(r.get("sport_name", "")).lower()]
         note = f"Filtered to sports matching {sport!r}."
+        if truncated and len(records) < limit:
+            note += (
+                " The filter scanned only the newest records and may have missed older "
+                "matches — narrow the date range for complete results."
+            )
     records = records[:limit]
     return _collection_result([transform_workout(r) for r in records], truncated, note)
 
@@ -591,8 +603,12 @@ def _search_window(query: str) -> tuple[date, date]:
     tz = get_tz()
     today = _today()
     if match := _ISO_DAY.search(query):
-        day = date.fromisoformat(match.group(1))
-        return day, day
+        try:
+            day = date.fromisoformat(match.group(1))
+        except ValueError:
+            pass  # looked like a date but isn't one; try the other patterns
+        else:
+            return day, day
     if match := _LAST_N.search(query):
         count = max(int(match.group(1)), 1)
         unit_days = {"day": 1, "week": 7, "month": 30}[match.group(2)]

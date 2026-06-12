@@ -39,7 +39,9 @@ DETAIL_TTL = 300.0
 
 
 class TokenProvider(Protocol):
-    async def get_access_token(self, *, force_refresh: bool = False) -> str: ...
+    async def get_access_token(
+        self, *, force_refresh: bool = False, rejected: str | None = None
+    ) -> str: ...
 
 
 class _TTLCache:
@@ -124,7 +126,9 @@ class WhoopClient:
                 if auth_retried:
                     raise AuthRequiredError("WHOOP rejected the access token even after refresh")
                 auth_retried = True
-                await self._tokens.get_access_token(force_refresh=True)
+                # Passing the rejected token lets the manager skip the rotation
+                # when a concurrent request already refreshed past it.
+                await self._tokens.get_access_token(force_refresh=True, rejected=token)
                 continue
 
             if response.status_code == 429:

@@ -107,3 +107,13 @@ def test_compare_metric_polarity_and_deadband():
     out = compare_metric("strain", 10.0, 14.0)
     assert out["assessment"] == "increased"
     assert compare_metric("strain", None, 14.0) is None
+
+
+def test_compare_metric_zero_baseline():
+    # 0 → 0 must be "unchanged", not a direction (pct is undefined at 0).
+    assert compare_metric("workouts", 0, 0)["assessment"] == "unchanged"
+    assert compare_metric("strain", 0.0, 0.0)["assessment"] == "unchanged"
+    # 0 → something still gets a direction even though pct is undefined.
+    out = compare_metric("workouts", 0, 5)
+    assert out["assessment"] == "increased"
+    assert out["change_pct"] is None

@@ -62,6 +62,13 @@ def test_invalid_expression_lists_supported_forms():
         point("a fortnight hence")
 
 
+def test_invalid_month_and_date_raise_whoop_errors():
+    with pytest.raises(WhoopError, match="Invalid month"):
+        point("2026-13")
+    with pytest.raises(WhoopError, match="Supported forms"):
+        point("2026-13-45")
+
+
 def test_record_offset_parsing():
     assert parse_record_offset("+05:30") == timedelta(hours=5, minutes=30)
     assert parse_record_offset("-04:00") == timedelta(hours=-4)

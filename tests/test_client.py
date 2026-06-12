@@ -129,6 +129,43 @@ async def test_network_error_retries(no_sleep):
     assert await client.profile() == {"user_id": 1}
 
 
+async def test_concurrent_401s_share_one_refresh(tmp_path):
+    """Concurrent requests hitting 401 must trigger exactly one rotation.
+
+    WHOOP invalidates the old pair on every refresh, so a refresh cascade
+    would knock out sibling retries (each rotation 401s the others).
+    """
+    import time
+
+    from whoop_mcp.tokens import TokenManager, TokenSet, TokenStore
+
+    store = TokenStore(tmp_path / "tokens.json")
+    # Looks unexpired locally, but the server already rejects it.
+    store.save(TokenSet("good-1", "refresh-1", time.time() + 3600))
+    refreshes = 0
+
+    async def refresher(_token: str) -> TokenSet:
+        nonlocal refreshes
+        refreshes += 1
+        return TokenSet(f"good-{refreshes + 1}", f"refresh-{refreshes + 1}", time.time() + 3600)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.headers["Authorization"] != "Bearer good-2":
+            return httpx.Response(401)
+        return httpx.Response(200, json={"records": [], "next_token": None, "user_id": 1})
+
+    manager = TokenManager(store, refresher=refresher)
+    client = WhoopClient(manager, transport=httpx.MockTransport(handler))
+    results = await asyncio.gather(
+        client.profile(),
+        client.body_measurement(),
+        client.cycles(),
+        client.recoveries(),
+    )
+    assert refreshes == 1
+    assert len(results) == 4  # nothing raised
+
+
 async def test_404_raises_api_error(fake_whoop: FakeWhoop):
     client = client_for(fake_whoop.handler)
     with pytest.raises(ApiError, match="not found"):

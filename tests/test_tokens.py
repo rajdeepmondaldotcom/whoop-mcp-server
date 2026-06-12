@@ -101,6 +101,48 @@ async def test_concurrent_calls_refresh_once(tmp_path):
     assert set(results) == {"access-2"}
 
 
+async def test_reauth_on_disk_rescues_running_manager(tmp_path):
+    """A fresh `whoop-mcp auth` must be picked up without restarting the server."""
+    store = TokenStore(tmp_path / "tokens.json")
+    store.save(fresh(expires_in=0))
+    calls = 0
+
+    async def failing_refresher(_token: str) -> TokenSet:
+        nonlocal calls
+        calls += 1
+        raise AuthRequiredError("refresh token revoked")
+
+    manager = TokenManager(store, refresher=failing_refresher)
+    with pytest.raises(AuthRequiredError):
+        await manager.get_access_token()
+    assert calls == 1
+
+    # User re-authorizes out of band; new tokens land on disk.
+    store.save(TokenSet("access-new", "refresh-new", time.time() + 3600))
+    assert await manager.get_access_token() == "access-new"
+    assert calls == 1  # no further refresh attempts
+
+
+async def test_rejected_token_skips_redundant_refresh(tmp_path):
+    """A 401 retry must not rotate again if a sibling already refreshed."""
+    store = TokenStore(tmp_path / "tokens.json")
+    store.save(fresh())  # access-1, not expired
+    calls = 0
+
+    async def refresher(_token: str) -> TokenSet:
+        nonlocal calls
+        calls += 1
+        return TokenSet(f"access-{calls + 1}", f"refresh-{calls + 1}", time.time() + 3600)
+
+    manager = TokenManager(store, refresher=refresher)
+    # The rejected token is already stale relative to the current one: no refresh.
+    assert await manager.get_access_token(force_refresh=True, rejected="access-0") == "access-1"
+    assert calls == 0
+    # The rejected token IS the current one: rotate.
+    assert await manager.get_access_token(force_refresh=True, rejected="access-1") == "access-2"
+    assert calls == 1
+
+
 async def test_static_token_bypasses_everything(tmp_path):
     manager = TokenManager(
         TokenStore(tmp_path / "tokens.json"),

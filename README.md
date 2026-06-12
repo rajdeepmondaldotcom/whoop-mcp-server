@@ -10,6 +10,7 @@ It connects your WHOOP data to Claude, ChatGPT, and any MCP client. You ask in p
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/rajdeepmondaldotcom/whoop-mcp-server)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MCP](https://img.shields.io/badge/protocol-MCP-8A2BE2)](https://modelcontextprotocol.io)
+[![Glama](https://glama.ai/mcp/servers/rajdeepmondaldotcom/whoop-mcp-server/badges/score.svg)](https://glama.ai/mcp/servers/rajdeepmondaldotcom/whoop-mcp-server)
 
 ```text
 You: should I train hard today?
